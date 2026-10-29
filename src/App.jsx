@@ -2,137 +2,45 @@ import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import { SomeHowWordmark } from './components/SomeHowWordmark.jsx';
-import { FluidHeroCanvas } from './components/FluidHeroCanvas.jsx';
-import { ARTIFACT_TYPES, TactileArtifact } from './components/TactileArtifacts.jsx';
-import { ProjectVisualCard } from './components/ProjectVisualCard.jsx';
 import {
-  CAPABILITIES_LIST,
-  FAQ_ITEMS,
-  PRICING_CATALOG,
-  TEAM_DATA,
-  WORKS_DATA
-} from './data/studioData.js';
+  LOADER_3D_OBJECTS,
+  MEDIA_ASSETS,
+  WORKS_ITEMS,
+  STUDIO_SERVICES,
+  FAQS,
+} from './data/studioData';
+import {
+  SomeHowNavLogo,
+  LoaderLeftGlyph,
+  LoaderRightGlyph,
+  SomeHowHeroLogo,
+  SomeHowFooterLogo,
+} from './components/SomeHowWordmark';
+import FluidHeroCanvas from './components/FluidHeroCanvas';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ0123456789#$()!?"§&<>@*+-';
-
-const PHYSICS_ITEMS = [
-  { id: 'art-1', kind: 'artifact', type: 'chrome-asterisk', left: '12%', top: '22%', baseRot: -14 },
-  { id: 'art-2', kind: 'artifact', type: 'acid-torus', left: '28%', top: '62%', baseRot: 18 },
-  { id: 'art-3', kind: 'artifact', type: 'orange-cube', left: '48%', top: '25%', baseRot: 12 },
-  { id: 'art-4', kind: 'artifact', type: 'metallic-pill', left: '68%', top: '58%', baseRot: -22 },
-  { id: 'art-5', kind: 'artifact', type: 'wire-sphere', left: '82%', top: '26%', baseRot: 9 },
-  { id: 'art-6', kind: 'artifact', type: 'liquid-star', left: '42%', top: '68%', baseRot: -8 },
-  { id: 'let-s', kind: 'letter', char: 'S', left: '18%', top: '66%', baseRot: -12, bg: '#0D0D0D', fg: '#F4F1EA' },
-  { id: 'let-o', kind: 'letter', char: 'O', left: '36%', top: '20%', baseRot: 15, bg: '#FF3B00', fg: '#F4F1EA' },
-  { id: 'let-m', kind: 'letter', char: 'M', left: '58%', top: '38%', baseRot: -9, bg: '#D4FF00', fg: '#0D0D0D' },
-  { id: 'let-h', kind: 'letter', char: '.H', left: '75%', top: '20%', baseRot: 14, bg: '#0D0D0D', fg: '#D4FF00' },
-  { id: 'let-w', kind: 'letter', char: 'W', left: '84%', top: '66%', baseRot: -16, bg: '#FF3B00', fg: '#F4F1EA' }
-];
-
 export default function App() {
-  const [loaderDone, setLoaderDone] = useState(false);
-  const [loaderCount, setLoaderCount] = useState('000');
-  const [loaderArtifactIdx, setLoaderArtifactIdx] = useState(0);
-  const [activeFilter, setActiveFilter] = useState('ALL');
-  const [openFaqIdx, setOpenFaqIdx] = useState(0);
-  const [selectedWork, setSelectedWork] = useState(null);
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState('Interactive Web Flagship (€4,500)');
-  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [heroRevealed, setHeroRevealed] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
   const [soundOn, setSoundOn] = useState(false);
-  const [ribbonDark, setRibbonDark] = useState(false);
-  const [activeReelMode, setActiveReelMode] = useState('agents');
-  const [lang, setLang] = useState('ENG');
+  const [selectedWork, setSelectedWork] = useState(null);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const loaderRef = useRef(null);
-  const heroWordmarkRef = useRef(null);
-  const worksSectionRef = useRef(null);
-  const museeSectionRef = useRef(null);
-  const museeFrameRef = useRef(null);
-  const formesWrapperRef = useRef(null);
+  const loaderImgWRef = useRef(null);
+  const loaderNbrRef = useRef(null);
+  const manifestoVideoRef = useRef(null);
+  const manifestoReflectRef = useRef(null);
+  const formesRef = useRef(null);
   const glitchSectionRef = useRef(null);
-  const faqSectionRef = useRef(null);
-  const footerWordmarkRef = useRef(null);
-  const audioCtxRef = useRef(null);
-  const oscRef = useRef(null);
 
-  // 1. Preloader sequence (000 -> 100 + rapid artifact cycling + hero wordmark staggered reveal)
-  useEffect(() => {
-    const cycleInterval = setInterval(() => {
-      setLoaderArtifactIdx((prev) => (prev + 1) % ARTIFACT_TYPES.length);
-    }, 240);
-
-    const counterObj = { val: 0 };
-    const tl = gsap.timeline({
-      onComplete: () => {
-        clearInterval(cycleInterval);
-        if (loaderRef.current) {
-          gsap.to(loaderRef.current, {
-            yPercent: -100,
-            duration: 1.15,
-            ease: 'power4.inOut',
-            onComplete: () => setLoaderDone(true)
-          });
-        } else {
-          setLoaderDone(true);
-        }
-
-        // Staggered Hero Wordmark Reveal (exact noth.in tf() mechanic)
-        if (heroWordmarkRef.current) {
-          const letters = heroWordmarkRef.current.querySelectorAll('.sh-letter');
-          const dot = heroWordmarkRef.current.querySelector('.sh-dot');
-          gsap.fromTo(
-            letters,
-            { yPercent: 120, opacity: 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              duration: 1.35,
-              ease: 'power4.out',
-              stagger: 0.055,
-              delay: 0.15
-            }
-          );
-          if (dot) {
-            gsap.fromTo(
-              dot,
-              { scale: 0, transformOrigin: 'center center' },
-              {
-                scale: 1,
-                duration: 0.65,
-                ease: 'back.out(1.7)',
-                delay: 0.75
-              }
-            );
-          }
-        }
-      }
-    });
-
-    tl.to(counterObj, {
-      val: 100,
-      duration: 2.1,
-      ease: 'power2.inOut',
-      onUpdate: () => {
-        setLoaderCount(String(Math.round(counterObj.val)).padStart(3, '0'));
-      }
-    });
-
-    return () => {
-      clearInterval(cycleInterval);
-      tl.kill();
-    };
-  }, []);
-
-  // 2. Lenis Smooth Scrolling + GSAP ScrollTrigger animations
+  // 1. Smooth Scroll (Lenis + GSAP ScrollTrigger sync)
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true
+      smoothWheel: true,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
@@ -142,436 +50,624 @@ export default function App() {
     gsap.ticker.add(tickerFn);
     gsap.ticker.lagSmoothing(0);
 
-    // Kinetic "w o r k s" letter vertical wave on scroll
-    const ctx = gsap.context(() => {
-      const workLetters = gsap.utils.toArray('.works-letter');
-      workLetters.forEach((el, idx) => {
-        const dir = idx % 2 === 0 ? 1 : -1;
-        gsap.fromTo(
-          el,
-          { yPercent: 0, scale: 1 },
-          {
-            yPercent: dir * 32,
-            scale: idx === 2 ? 0.86 : 1.06,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: worksSectionRef.current,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: 1.5
-            }
-          }
-        );
-      });
-
-      // Museum / Architectural Frame scale-down on scroll (.musee-w)
-      if (museeSectionRef.current && museeFrameRef.current) {
-        gsap.fromTo(
-          museeFrameRef.current,
-          { scale: 1.14 },
-          {
-            scale: 0.92,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: museeSectionRef.current,
-              start: 'top 85%',
-              end: 'bottom top',
-              scrub: 1.2
-            }
-          }
-        );
-      }
-
-      // Dark section detection for the left-edge Studio Ribbon
-      if (glitchSectionRef.current) {
-        ScrollTrigger.create({
-          trigger: glitchSectionRef.current,
-          start: 'top 50%',
-          end: 'bottom 50%',
-          onEnter: () => setRibbonDark(true),
-          onLeave: () => setRibbonDark(false),
-          onEnterBack: () => setRibbonDark(true),
-          onLeaveBack: () => setRibbonDark(false)
-        });
-      }
-      if (faqSectionRef.current) {
-        ScrollTrigger.create({
-          trigger: faqSectionRef.current,
-          start: 'top 50%',
-          end: 'bottom 50%',
-          onEnter: () => setRibbonDark(true),
-          onLeave: () => setRibbonDark(false),
-          onEnterBack: () => setRibbonDark(true),
-          onLeaveBack: () => setRibbonDark(false)
-        });
-      }
-
-      // Footer giant SOME.HOW staggered entrance on scroll
-      if (footerWordmarkRef.current) {
-        const footerLetters = footerWordmarkRef.current.querySelectorAll('.sh-letter');
-        const footerDot = footerWordmarkRef.current.querySelector('.sh-dot');
-        gsap.fromTo(
-          footerLetters,
-          { yPercent: 110 },
-          {
-            yPercent: 0,
-            duration: 1.15,
-            ease: 'power4.out',
-            stagger: 0.04,
-            scrollTrigger: {
-              trigger: footerWordmarkRef.current,
-              start: 'top 95%',
-              once: true
-            }
-          }
-        );
-        if (footerDot) {
-          gsap.fromTo(
-            footerDot,
-            { scale: 0, transformOrigin: 'center center' },
-            {
-              scale: 1,
-              duration: 0.65,
-              ease: 'back.out(1.7)',
-              delay: 0.45,
-              scrollTrigger: {
-                trigger: footerWordmarkRef.current,
-                start: 'top 95%',
-                once: true
-              }
-            }
-          );
-        }
-      }
-    });
-
     return () => {
-      ctx.revert();
       gsap.ticker.remove(tickerFn);
       lenis.destroy();
     };
   }, []);
 
-  // 3. Custom Magnetic "explore ->" Cursor inside Work Cards (exact noth.in Wv() lerp)
-  useEffect(() => {
-    const links = document.querySelectorAll('.work-link');
-    const cleanups = [];
-
-    links.forEach((link) => {
-      const cursor = link.querySelector('.cursor-work');
-      if (!cursor) return;
-
-      const state = { tx: 0, ty: 0, cx: 0, cy: 0, raf: null, active: false };
-      const lerp = 0.14;
-
-      const tick = () => {
-        state.cx += (state.tx - state.cx) * lerp;
-        state.cy += (state.ty - state.cy) * lerp;
-        gsap.set(cursor, { x: state.cx, y: state.cy });
-        if (
-          state.active ||
-          Math.abs(state.cx - state.tx) > 0.1 ||
-          Math.abs(state.cy - state.ty) > 0.1
-        ) {
-          state.raf = requestAnimationFrame(tick);
-        } else {
-          state.raf = null;
-        }
-      };
-
-      const onMove = (e) => {
-        const rect = link.getBoundingClientRect();
-        state.tx = e.clientX - rect.left;
-        state.ty = e.clientY - rect.top;
-        if (!state.active) {
-          state.cx = state.tx;
-          state.cy = state.ty;
-          gsap.set(cursor, { x: state.cx, y: state.cy });
-          state.active = true;
-          gsap.to(cursor, {
-            scale: 1,
-            opacity: 1,
-            duration: 0.45,
-            ease: 'back.out(1.8)',
-            overwrite: 'auto'
-          });
-        }
-        if (!state.raf) state.raf = requestAnimationFrame(tick);
-      };
-
-      const onLeave = () => {
-        state.active = false;
-        gsap.to(cursor, {
-          scale: 0,
-          opacity: 0,
-          duration: 0.3,
-          ease: 'power3.in',
-          overwrite: 'auto'
-        });
-      };
-
-      link.addEventListener('mousemove', onMove);
-      link.addEventListener('mouseleave', onLeave);
-      cleanups.push(() => {
-        link.removeEventListener('mousemove', onMove);
-        link.removeEventListener('mouseleave', onLeave);
-        if (state.raf) cancelAnimationFrame(state.raf);
-      });
-    });
-
-    return () => cleanups.forEach((fn) => fn());
-  }, [activeFilter]);
-
-  // 4. Repulsive Physics Playground (.formes-w — exact noth.in Yv() repulsion formula)
-  useEffect(() => {
-    const wrapper = formesWrapperRef.current;
-    if (!wrapper) return;
-    const objects = [...wrapper.querySelectorAll('.formes-object')];
-    if (objects.length === 0) return;
-
-    const handleMove = (e) => {
-      const mx = e.clientX;
-      const my = e.clientY;
-      const influenceRadius = window.innerWidth < 768 ? 220 : 380;
-      const maxDistance = window.innerWidth < 768 ? 95 : 240;
-      const rotForce = 28;
-      const scaleForce = 0.18;
-
-      objects.forEach((obj) => {
-        const curX = Number(gsap.getProperty(obj, 'x')) || 0;
-        const curY = Number(gsap.getProperty(obj, 'y')) || 0;
-        const baseRot = parseFloat(obj.dataset.baseRot || '0');
-        const rect = obj.getBoundingClientRect();
-        const ox = rect.left + rect.width / 2 - curX;
-        const oy = rect.top + rect.height / 2 - curY;
-        const dist = Math.hypot(mx - ox, my - oy);
-
-        if (dist < influenceRadius) {
-          const angle = Math.atan2(my - oy, mx - ox);
-          const power = Math.pow((influenceRadius - dist) / influenceRadius, 1.55);
-          const push = power * maxDistance;
-          const rot = baseRot - Math.cos(angle) * power * rotForce;
-          gsap.to(obj, {
-            x: -Math.cos(angle) * push,
-            y: -Math.sin(angle) * push,
-            rotation: rot,
-            scale: 1 + power * scaleForce,
-            duration: 0.42,
-            ease: 'power4.out',
-            overwrite: 'auto'
-          });
-        } else {
-          gsap.to(obj, {
-            x: 0,
-            y: 0,
-            rotation: baseRot,
-            scale: 1,
-            duration: 1.15,
-            ease: 'elastic.out(1, 0.35)',
-            overwrite: 'auto'
-          });
-        }
-      });
-    };
-
-    const handleLeave = () => {
-      objects.forEach((obj) => {
-        const baseRot = parseFloat(obj.dataset.baseRot || '0');
-        gsap.to(obj, {
-          x: 0,
-          y: 0,
-          rotation: baseRot,
-          scale: 1,
-          duration: 1.2,
-          ease: 'elastic.out(1, 0.35)',
-          overwrite: 'auto'
-        });
-      });
-    };
-
-    wrapper.addEventListener('mousemove', handleMove);
-    wrapper.addEventListener('mouseleave', handleLeave);
-    return () => {
-      wrapper.removeEventListener('mousemove', handleMove);
-      wrapper.removeEventListener('mouseleave', handleLeave);
-    };
-  }, []);
-
-  // 5. Scroll-Velocity Character Scramble in Glitch Section (exact noth.in ax() mechanic)
-  useEffect(() => {
-    const section = glitchSectionRef.current;
-    if (!section) return;
-    const lines = [...section.querySelectorAll('.glitch-scramble-line')];
-    const originals = lines.map((l) => l.dataset.text || l.textContent);
-
-    let raf = null;
-    let intensity = 0;
-
-    const scrambleString = (str, prob) =>
-      str
-        .split('')
-        .map((ch) => {
-          if (ch === ' ') return ' ';
-          return Math.random() < prob
-            ? SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
-            : ch;
-        })
-        .join('');
-
-    const updateLoop = () => {
-      intensity *= 0.9;
-      if (intensity > 0.015) {
-        lines.forEach((line, idx) => {
-          line.textContent = scrambleString(originals[idx], intensity);
-        });
-        raf = requestAnimationFrame(updateLoop);
-      } else {
-        lines.forEach((line, idx) => {
-          line.textContent = originals[idx];
-        });
-        raf = null;
-      }
-    };
-
-    const st = ScrollTrigger.create({
-      trigger: section,
-      start: 'top bottom',
-      end: 'bottom top',
-      onUpdate: (self) => {
-        const vel = Math.abs(self.getVelocity());
-        intensity = Math.min(vel / 2800, 0.55);
-        if (intensity > 0.02 && !raf) {
-          raf = requestAnimationFrame(updateLoop);
-        }
-      }
-    });
-
-    return () => {
-      st.kill();
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  // Elastic squish-and-rebound on wordmark letters (exact noth.in hx() mechanic)
-  const handleWordmarkLetterHover = (pathEl) => {
-    if (pathEl.dataset.animating === '1') return;
-    pathEl.dataset.animating = '1';
-    gsap
-      .timeline({
-        onComplete: () => {
-          pathEl.dataset.animating = '0';
-        }
-      })
-      .to(pathEl, {
-        scaleY: 0.08,
-        scaleX: 1.12,
-        duration: 0.45,
-        ease: 'power2.inOut',
-        transformOrigin: '50% 50%'
-      })
-      .to(pathEl, {
-        scaleY: 1,
-        scaleX: 1,
-        duration: 1.55,
-        ease: 'elastic.out(1, 0.75)'
-      });
-  };
-
-  // Ambient Web Audio Synthesizer toggle for the Museum Showcase Frame
-  const toggleAmbientSound = () => {
-    if (!soundOn) {
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioCtx();
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(110, ctx.currentTime); // A2 warm drone
-        osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(164.81, ctx.currentTime); // E3 fifth harmonic
-
-        gain.gain.setValueAtTime(0.001, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.035, ctx.currentTime + 0.8);
-
-        osc1.connect(gain);
-        osc2.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc1.start();
-        osc2.start();
-        audioCtxRef.current = ctx;
-        oscRef.current = { osc1, osc2, gain };
-        setSoundOn(true);
-      } catch {
-        setSoundOn(true);
-      }
-    } else {
-      if (audioCtxRef.current) {
-        try {
-          audioCtxRef.current.close();
-        } catch {}
-        audioCtxRef.current = null;
-      }
-      setSoundOn(false);
+  // 2. Opening Black Loader Animation (exact hM / uM / I_ / cM from noth.in)
+  const runLoaderSequence = () => {
+    const loader = loaderRef.current;
+    const imgW = loaderImgWRef.current;
+    const nbr = loaderNbrRef.current;
+    if (!loader || !imgW || !nbr) {
+      setHeroRevealed(true);
+      return;
     }
+
+    setHeroRevealed(false);
+    gsap.set(loader, { display: 'block', height: '100vh' });
+    const nLoad = loader.querySelector('.n-load');
+    const aposLoad = loader.querySelector('.apos-load');
+    const imgs = [...loader.querySelectorAll('.loader-img')];
+
+    gsap.set(nbr, { autoAlpha: 1 });
+    nbr.textContent = '100';
+    imgs.forEach((img) => gsap.set(img, { opacity: 0, scale: 0.8 }));
+    gsap.set(imgW, { width: '1rem' });
+    if (nLoad) gsap.set(nLoad, { yPercent: 100, opacity: 0 });
+    if (aposLoad) gsap.set(aposLoad, { scale: 0, opacity: 1, transformOrigin: 'center center' });
+
+    const totalDurationMs = 3400;
+    let activeIdx = 0;
+    let cycleTimeout = null;
+
+    const finishLoader = () => {
+      if (cycleTimeout) clearTimeout(cycleTimeout);
+      const currentImg = imgs[activeIdx];
+      if (currentImg) {
+        gsap.to(currentImg, { scale: 0, duration: 0.45, ease: 'power4.inOut', delay: 0.15 });
+      }
+      gsap.to(imgW, {
+        width: '1rem',
+        duration: 0.65,
+        ease: 'power4.inOut',
+        delay: 0.25,
+        onComplete: () => {
+          gsap.to(nbr, { autoAlpha: 0, duration: 0.4, ease: 'power4.inOut' });
+          if (nLoad) gsap.to(nLoad, { yPercent: 100, duration: 0.8, ease: 'power4.inOut' });
+          if (aposLoad) gsap.to(aposLoad, { scale: 0, duration: 0.8, ease: 'power4.inOut' });
+          gsap.to(loader, {
+            height: 0,
+            duration: 1.35,
+            ease: 'power4.inOut',
+            onComplete: () => {
+              gsap.set(loader, { display: 'none' });
+            },
+          });
+          setHeroRevealed(true);
+        },
+      });
+    };
+
+    const stepImages = (startTime) => {
+      const elapsed = performance.now() - startTime;
+      if (elapsed >= totalDurationMs) {
+        finishLoader();
+        return;
+      }
+      const progress = Math.min(elapsed / totalDurationMs, 1);
+      const delayMs = 95 + (320 - 95) * (1 - Math.sin(progress * Math.PI));
+
+      cycleTimeout = setTimeout(() => {
+        const prevImg = imgs[activeIdx];
+        if (prevImg) {
+          gsap.killTweensOf(prevImg);
+          gsap.set(prevImg, { opacity: 0 });
+        }
+        activeIdx = (activeIdx + 1) % imgs.length;
+        const nextImg = imgs[activeIdx];
+        if (nextImg) {
+          gsap.killTweensOf(nextImg);
+          gsap.fromTo(
+            nextImg,
+            { opacity: 0, scale: 0.78, rotate: (Math.random() - 0.5) * 24 },
+            { opacity: 1, scale: 1, rotate: (Math.random() - 0.5) * 12, duration: 0.26, ease: 'back.out(1.3)' }
+          );
+        }
+        stepImages(startTime);
+      }, delayMs);
+    };
+
+    // Step 1: Bring in S and '
+    gsap.to(nLoad, {
+      opacity: 1,
+      yPercent: 0,
+      duration: 0.75,
+      ease: 'power4.inOut',
+      onComplete: () => {
+        const targetW = window.matchMedia('(max-width: 991px)').matches ? '10rem' : '20rem';
+        gsap.fromTo(imgW, { width: '1rem' }, { width: targetW, duration: 0.95, ease: 'power4.inOut' });
+        if (imgs[0]) {
+          gsap.set(imgs[0], { opacity: 1, scale: 0 });
+          gsap.to(imgs[0], {
+            scale: 1,
+            rotate: 15,
+            duration: 0.6,
+            ease: 'back.out(0.9)',
+            delay: 0.3,
+            onComplete: () => {
+              // Counter 100 -> 000
+              const counter = { val: 100 };
+              gsap.to(counter, {
+                val: 0,
+                duration: totalDurationMs / 1000,
+                ease: 'power2.inOut',
+                onUpdate: () => {
+                  if (nbr) nbr.textContent = String(Math.round(counter.val)).padStart(3, '0');
+                },
+                onComplete: () => {
+                  if (nbr) nbr.textContent = '000';
+                },
+              });
+              stepImages(performance.now());
+            },
+          });
+        }
+      },
+    });
+    if (aposLoad) {
+      gsap.to(aposLoad, { scale: 1, duration: 0.75, ease: 'power4.inOut' });
+    }
+
+    return () => {
+      if (cycleTimeout) clearTimeout(cycleTimeout);
+    };
   };
 
-  const filteredWorks = WORKS_DATA.filter((w) => {
-    if (activeFilter === 'ALL') return true;
-    if (activeFilter === 'WEB') return w.category.includes('Web') || w.category.includes('3D');
-    if (activeFilter === 'SOFTWARE') return w.category.includes('Software');
-    if (activeFilter === 'AI') return w.category.includes('AI');
-    return true;
-  });
+  useEffect(() => {
+    const cleanup = runLoaderSequence();
+    return cleanup;
+  }, []);
 
-  const openContactWithPackage = (pkgName) => {
-    setSelectedPackage(pkgName);
-    setContactSubmitted(false);
-    setContactModalOpen(true);
+  // 3. Navbar menu hover & scroll animations (xv, Vv, lx, Yv, ax from noth.in)
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const isDesktop = window.matchMedia('(min-width: 992px)').matches;
+
+      // A. Menu button 4-square rotation + staggered links slide
+      const menuBtn = document.querySelector('.menu-btn');
+      const menuLinksW = document.querySelector('.menu-links-w');
+      const menuSvg = document.querySelector('.menu-svg');
+      const menuRects = menuSvg ? [...menuSvg.querySelectorAll('rect')] : [];
+      const menuLinks = menuLinksW ? [...menuLinksW.querySelectorAll('.link-boiler-inner')] : [];
+
+      if (isDesktop && menuBtn && menuLinksW && menuLinks.length) {
+        gsap.set(menuLinks, { yPercent: 110 });
+        if (menuSvg) gsap.set(menuSvg, { transformOrigin: '50% 50%' });
+
+        const offsets = menuRects.map((r) => ({
+          x: parseFloat(r.getAttribute('x') || '0') + 1 < 3 ? 0.35 : -0.35,
+          y: parseFloat(r.getAttribute('y') || '0') + 1 < 3 ? 0.35 : -0.35,
+        }));
+
+        const menuTl = gsap.timeline({ paused: true });
+        if (menuSvg) menuTl.to(menuSvg, { rotateZ: 45, duration: 0.5, ease: 'power4.out' }, 0);
+        menuRects.forEach((r, idx) => {
+          menuTl.to(r, { x: offsets[idx].x, y: offsets[idx].y, duration: 0.5, ease: 'power4.out' }, 0);
+        });
+        menuTl.to(menuLinks, { yPercent: 0, duration: 0.55, ease: 'power4.out', stagger: 0.07 }, 0);
+
+        let closeTimer = null;
+        const openMenu = () => {
+          clearTimeout(closeTimer);
+          menuTl.play();
+        };
+        const closeMenu = () => {
+          clearTimeout(closeTimer);
+          closeTimer = setTimeout(() => menuTl.reverse(), 80);
+        };
+
+        menuBtn.addEventListener('mouseenter', openMenu);
+        menuBtn.addEventListener('mouseleave', closeMenu);
+        menuLinksW.addEventListener('mouseenter', openMenu);
+        menuLinksW.addEventListener('mouseleave', closeMenu);
+      }
+
+      // B. Showreel scroll-scrubbed scale down (exact xv() from noth.in)
+      if (isDesktop) {
+        const showreelSection = document.querySelector('.section.showreel');
+        const showreelFullW = document.querySelector('.video-showreel-full-w');
+        if (showreelSection && showreelFullW) {
+          gsap.fromTo(
+            showreelFullW,
+            { width: '100%', height: '100%' },
+            {
+              width: '33.3%',
+              height: '35%',
+              ease: 'power4.inOut',
+              immediateRender: false,
+              scrollTrigger: {
+                trigger: showreelSection,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 2.5,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+      }
+
+      // C. Works sticky word convergence + clip-path reveal + parallax + lerped cursor
+      const worksSection = document.querySelector('.section.works');
+      if (worksSection && isDesktop) {
+        const letters = [...worksSection.querySelectorAll('.works-word')];
+        if (letters.length === 5) {
+          gsap.fromTo(
+            letters,
+            {
+              x: (i) => (i - 2) * window.innerWidth * 0.17,
+            },
+            {
+              x: 0,
+              ease: 'power4.inOut',
+              scrollTrigger: {
+                trigger: worksSection,
+                start: 'top 80%',
+                end: 'bottom bottom',
+                scrub: 2,
+              },
+            }
+          );
+        }
+      }
+
+      const workItems = [...document.querySelectorAll('.work_item')];
+      workItems.forEach((item, idx) => {
+        const imgW = item.querySelector('.img-work-w');
+        const img = item.querySelector('.img-work');
+        const cfg = WORKS_ITEMS[idx % WORKS_ITEMS.length];
+
+        if (imgW) {
+          gsap.set(imgW, { clipPath: cfg.clipInitial });
+          gsap.to(imgW, {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            ease: 'power4.inOut',
+            duration: 1.1,
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+            },
+          });
+        }
+
+        if (isDesktop) {
+          gsap.fromTo(
+            item,
+            { y: 0 },
+            {
+              y: cfg.parallaxY,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: item,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1.5,
+              },
+            }
+          );
+          if (img) {
+            gsap.fromTo(
+              img,
+              { yPercent: -5 },
+              {
+                yPercent: -18,
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: item,
+                  start: 'top bottom',
+                  end: 'bottom center',
+                  scrub: 2.5,
+                },
+              }
+            );
+          }
+        }
+
+        // Lerped cursor pill inside each work card (exact Wv() from noth.in)
+        const link = item.querySelector('.work-link');
+        const cursor = item.querySelector('.cursor-work');
+        if (link && cursor) {
+          gsap.set(cursor, {
+            position: 'absolute',
+            xPercent: -50,
+            yPercent: -50,
+            left: 0,
+            top: 0,
+            scale: 0,
+            autoAlpha: 0,
+            pointerEvents: 'none',
+            zIndex: 10,
+          });
+          const state = { tx: 0, ty: 0, cx: 0, cy: 0, raf: null, active: false };
+          const tick = () => {
+            state.cx += (state.tx - state.cx) * 0.11;
+            state.cy += (state.ty - state.cy) * 0.11;
+            gsap.set(cursor, { x: state.cx, y: state.cy });
+            if (
+              state.active ||
+              Math.abs(state.cx - state.tx) > 0.05 ||
+              Math.abs(state.cy - state.ty) > 0.05
+            ) {
+              state.raf = requestAnimationFrame(tick);
+            } else {
+              state.raf = null;
+            }
+          };
+          link.addEventListener('mousemove', (e) => {
+            const rect = link.getBoundingClientRect();
+            state.tx = e.clientX - rect.left;
+            state.ty = e.clientY - rect.top;
+            if (!state.active) {
+              state.cx = state.tx;
+              state.cy = state.ty;
+              gsap.set(cursor, { x: state.cx, y: state.cy });
+              state.active = true;
+              gsap.to(cursor, {
+                scale: 1,
+                autoAlpha: 1,
+                duration: 0.55,
+                ease: 'back.out(1.8)',
+                overwrite: 'auto',
+              });
+            }
+            if (!state.raf) state.raf = requestAnimationFrame(tick);
+          });
+          link.addEventListener('mouseleave', () => {
+            state.active = false;
+            gsap.to(cursor, {
+              scale: 0,
+              autoAlpha: 0,
+              duration: 0.35,
+              ease: 'power3.in',
+              overwrite: 'auto',
+            });
+          });
+        }
+      });
+
+      // D. Museum / Manifesto Pinned Video Section (exact lx() from noth.in)
+      const museeW = document.querySelector('.musee-w');
+      if (museeW && isDesktop) {
+        const videoW = museeW.querySelector('.video-w');
+        const museeBg = museeW.querySelector('.musee-bg');
+        if (videoW) {
+          gsap.fromTo(
+            videoW,
+            { scale: 1.4 },
+            {
+              scale: 0.38,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: museeW,
+                start: 'top top',
+                end: 'bottom top',
+                pin: museeW,
+                pinSpacing: true,
+                scrub: 1,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+        if (museeBg) {
+          gsap.fromTo(
+            museeBg,
+            { scale: 1.8 },
+            {
+              scale: 1,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: museeW,
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 1,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+      }
+
+      // E. Parallax image blocks in Studio section (exact nx() from noth.in)
+      document.querySelectorAll('[data-parallax-y]').forEach((el) => {
+        const py = parseFloat(el.getAttribute('data-parallax-y') || '-60');
+        const scrub = parseFloat(el.getAttribute('data-parallax-scrub') || '1.5');
+        gsap.fromTo(
+          el,
+          { y: 0 },
+          {
+            y: py,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub,
+            },
+          }
+        );
+      });
+
+      // F. Repulsive 3D Objects & Letter Cursors in .formes-w (exact Yv() from noth.in)
+      const formesEl = formesRef.current;
+      if (formesEl) {
+        const objects = [...formesEl.querySelectorAll('img, svg')];
+        objects.forEach((obj) => {
+          const computedRot = Number(gsap.getProperty(obj, 'rotation')) || 0;
+          obj.dataset.baseRot = String(computedRot);
+        });
+
+        const applyRepulsion = (mx, my) => {
+          const isMobile = window.matchMedia('(max-width: 767px)').matches;
+          const influenceRadius = isMobile ? 260 : 460;
+          const maxDistance = isMobile ? 110 : 380;
+          const rotForce = isMobile ? 12 : 30;
+          const scaleForce = isMobile ? 0.1 : 0.2;
+
+          objects.forEach((obj) => {
+            const curX = Number(gsap.getProperty(obj, 'x')) || 0;
+            const curY = Number(gsap.getProperty(obj, 'y')) || 0;
+            const rect = obj.getBoundingClientRect();
+            const ox = rect.left + rect.width / 2 - curX;
+            const oy = rect.top + rect.height / 2 - curY;
+            const dist = Math.hypot(mx - ox, my - oy);
+            const baseRot = parseFloat(obj.dataset.baseRot || '0');
+
+            if (dist < influenceRadius) {
+              const angle = Math.atan2(my - oy, mx - ox);
+              const factor = Math.pow((influenceRadius - dist) / influenceRadius, 1.6);
+              const push = factor * maxDistance;
+              const rot = baseRot - Math.cos(angle) * factor * rotForce;
+              gsap.to(obj, {
+                x: -Math.cos(angle) * push,
+                y: -Math.sin(angle) * push,
+                rotation: rot,
+                scale: 1 + factor * scaleForce,
+                duration: 0.45,
+                ease: 'power4.out',
+                overwrite: 'auto',
+              });
+            } else {
+              gsap.to(obj, {
+                x: 0,
+                y: 0,
+                rotation: baseRot,
+                scale: 1,
+                duration: 1.2,
+                ease: 'elastic.out(1, 0.35)',
+                overwrite: 'auto',
+              });
+            }
+          });
+        };
+
+        const onMove = (e) => applyRepulsion(e.clientX, e.clientY);
+        const onLeave = () => {
+          objects.forEach((obj) => {
+            gsap.to(obj, {
+              x: 0,
+              y: 0,
+              rotation: parseFloat(obj.dataset.baseRot || '0'),
+              scale: 1,
+              duration: 1.2,
+              ease: 'elastic.out(1, 0.35)',
+              overwrite: 'auto',
+            });
+          });
+        };
+
+        formesEl.addEventListener('mousemove', onMove);
+        formesEl.addEventListener('mouseleave', onLeave);
+      }
+
+      // G. Glitch Section Scroll-Velocity Scramble & Parallax (exact ax() from noth.in)
+      const glitchEl = glitchSectionRef.current;
+      if (glitchEl) {
+        const glitchImgW = glitchEl.querySelector('.glitch-img-w');
+        const imgGlitchW = glitchEl.querySelector('.img-glitch-w');
+        const glitchBlocks = [...glitchEl.querySelectorAll('.text-block-6')];
+        const glitchCharset = 'Pj(è !”.U§hsjkjkrh@#%&*+=?/:;<>[]{}~';
+
+        if (glitchImgW) {
+          gsap.to(glitchImgW, {
+            opacity: 0.28,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: glitchEl,
+              start: 'top top',
+              end: 'center center',
+              scrub: 2,
+            },
+          });
+        }
+        if (imgGlitchW) {
+          const [leftCard, rightCard] = [...imgGlitchW.children];
+          if (leftCard) {
+            gsap.fromTo(
+              leftCard,
+              { y: 100 },
+              {
+                y: -280,
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: glitchEl,
+                  start: 'top top',
+                  end: 'bottom top',
+                  scrub: 1.5,
+                },
+              }
+            );
+          }
+          if (rightCard) {
+            gsap.fromTo(
+              rightCard,
+              { y: 100 },
+              {
+                y: -680,
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: glitchEl,
+                  start: 'top top',
+                  end: 'bottom top',
+                  scrub: 2.8,
+                },
+              }
+            );
+          }
+        }
+
+        // Scroll-driven glitch scramble on .text-block-6
+        const baseLines = [
+          'we are some.how',
+          'we are some.how',
+          'we are some.how',
+          'Pj(è !!” .      U§hs .   jkj . k .    rh',
+        ];
+        ScrollTrigger.create({
+          trigger: glitchEl,
+          start: 'top bottom',
+          end: 'bottom top',
+          onUpdate: (self) => {
+            const vel = Math.min(Math.abs(self.getVelocity()) / 1800, 0.55);
+            if (vel < 0.04) return;
+            glitchBlocks.forEach((blk) => {
+              const lines = baseLines.map((line, li) => {
+                if (li === 3) return line;
+                return line
+                  .split('')
+                  .map((ch) => {
+                    if (ch === ' ') return ' ';
+                    return Math.random() < vel * 0.45
+                      ? glitchCharset[Math.floor(Math.random() * glitchCharset.length)]
+                      : ch;
+                  })
+                  .join('');
+              });
+              blk.innerHTML = lines.join('<br/>');
+            });
+          },
+        });
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Toggle sound on Manifesto video
+  const handleToggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    const vid = manifestoVideoRef.current;
+    if (vid) {
+      vid.muted = !next;
+      if (next) {
+        vid.volume = 0.85;
+        vid.play().catch(() => {});
+      }
+    }
   };
 
   return (
     <>
-      {/* ====================================================================
-          PRELOADER (000 -> 100 WITH TACTILE ARTIFACTS)
-         ==================================================================== */}
-      {!loaderDone && (
-        <div ref={loaderRef} className="loader" aria-label="Loading Some.how">
-          <div className="loader-top-bar">
-            <span>SOME.HOW // AUGMENTED DESIGN, SOFTWARE &amp; AI STUDIO</span>
-            <span>ATHENS · LONDON · REMOTE</span>
-          </div>
-
-          <div className="loader-center-stage">
-            <span className="loader-glyph">S</span>
-            <div className="loader-artifact-slot">
-              <TactileArtifact
-                type={ARTIFACT_TYPES[loaderArtifactIdx]}
-                className="loader-artifact-svg"
-              />
+      {/* Persistent Architectural Blueprint Grid across the entire website & landing page */}
+      <div className="architectural-grid-bg" aria-hidden="true">
+        <div className="arch-grid-columns">
+          {Array.from({ length: 12 }).map((_, idx) => (
+            <div key={idx} className="arch-grid-col">
+              <span className="arch-col-index">{String(idx + 1).padStart(2, '0')}</span>
+              <span className="arch-crosshair top">+</span>
+              <span className="arch-crosshair mid">+</span>
+              <span className="arch-crosshair bot">+</span>
             </div>
-            <span className="loader-glyph">
-              <span className="loader-dot">.</span>H
-            </span>
-          </div>
-
-          <div className="loader-bottom-bar">
-            <div className="loader-status-tag">
-              INITIALIZING FLUID SHADER &amp; SYSTEM ARCHITECTURE...
-            </div>
-            <div className="loader-counter">{loaderCount}</div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* ====================================================================
-          FIXED MIX-BLEND NAVIGATION BAR & 4-DOT ROTATING MENU
-         ==================================================================== */}
-      <nav className="nav-boiler" aria-label="Primary Navigation">
-        <a href="#top" className="nav-logo-wrap" aria-label="Some.how Home">
-          <SomeHowWordmark className="nav-logo" dotColor="#FF3B00" />
+      {/* Fixed Mix-Blend Navbar (exact .nav-boiler from noth.in) */}
+      <nav className="nav-boiler">
+        <a
+          href="#top"
+          className="nav-logo-wrap"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        >
+          <SomeHowNavLogo />
         </a>
 
         <div className="menu-w">
@@ -579,6 +675,7 @@ export default function App() {
             <div className="menu-btn-text">menu</div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
+              width="100%"
               viewBox="0 0 6 6"
               fill="none"
               className="menu-svg"
@@ -591,1237 +688,995 @@ export default function App() {
           </div>
           <div className="menu-links-w">
             <a href="#works" className="link-boiler">
-              works
+              <span className="link-boiler-inner">works</span>
             </a>
             <a href="#studio" className="link-boiler">
-              studio
+              <span className="link-boiler-inner">STUDIO</span>
             </a>
-            <a href="#method" className="link-boiler">
-              method &amp; pricing
+            <a href="#studio-video" className="link-boiler">
+              <span className="link-boiler-inner">manifesto</span>
             </a>
             <a href="#faqs" className="link-boiler">
-              faqs
+              <span className="link-boiler-inner">faqs</span>
             </a>
-            <button
-              type="button"
-              onClick={() => openContactWithPackage('General Discovery Call')}
+            <a
+              href="#contact"
               className="link-boiler"
+              onClick={(e) => {
+                e.preventDefault();
+                setContactOpen(true);
+              }}
             >
-              contact
-            </button>
+              <span className="link-boiler-inner">contact</span>
+            </a>
           </div>
         </div>
       </nav>
 
-      {/* ====================================================================
-          LEFT-EDGE CONTRAST-AWARE STUDIO RIBBON
-         ==================================================================== */}
-      <div
-        className={`studio-ribbon ${ribbonDark ? 'on-dark' : ''}`}
-        onClick={() => openContactWithPackage('Discovery Call — Q4/Q1 Slot')}
-        title="Start a project with Some.how"
-      >
-        <span className="ribbon-mark">S.H</span>
-        <span className="ribbon-vertical-text">Featured Studio &apos;26</span>
+      {/* Black Opening Loader with all 12 of noth.in's 3D sculptural objects */}
+      <div ref={loaderRef} className="loader">
+        <div className="loader-c">
+          <div className="fake-top-loader">
+            <div>SOME.HOW</div>
+          </div>
+          <div className="loader-anim">
+            <div className="loader-glyph-clip">
+              <LoaderLeftGlyph />
+            </div>
+            <div ref={loaderImgWRef} className="loader-img-w">
+              {LOADER_3D_OBJECTS.map((obj) => (
+                <img
+                  key={obj.id}
+                  src={obj.src}
+                  alt={obj.alt}
+                  className={`loader-img ${obj.cls}`}
+                />
+              ))}
+            </div>
+            <LoaderRightGlyph />
+          </div>
+          <div className="loader-nbr-w">
+            <div ref={loaderNbrRef}>100</div>
+          </div>
+        </div>
       </div>
 
-      {/* ====================================================================
-          HERO SECTION WITH FLUID REVEAL CANVAS & MONUMENTAL WORDMARK
-         ==================================================================== */}
-      <header id="top" className="section-hero-wrap">
-        <FluidHeroCanvas />
-
-        <div className="hero-top-grid">
-          <div className="hero-manifesto-block">
-            <p className="p-l">
-              {lang === 'ENG' ? (
-                <>
-                  Not a template, an instinct.
-                  <br />
-                  Because impossible happens{' '}
-                  <span className="hero-accent-highlight">Some.how.</span>
-                </>
-              ) : (
-                <>
-                  Όχι πρότυπο, αλλά ένστικτο.
-                  <br />
-                  Γιατί το αδύνατο γίνεται{' '}
-                  <span className="hero-accent-highlight">Some.how.</span>
-                </>
-              )}
-            </p>
-
-            <div className="hero-cta-row">
-              <button
-                type="button"
-                onClick={() => openContactWithPackage('Discovery Call — Custom Project')}
-                className="btn"
-              >
-                <span>{lang === 'ENG' ? 'book a discovery call' : 'κλείστε κλήση'}</span>
-                <span className="arrow-w">
-                  <svg viewBox="0 0 18 12" fill="none" className="btn-arrow-svg">
-                    <path
-                      d="M11.5 1L16.5 6L11.5 11M16 6H1"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </button>
-
-              <a href="#works" className="btn btn-outline">
-                <span>explore selected works (06)</span>
-              </a>
-            </div>
-          </div>
-
-          <div className="hero-telemetry-card">
-            <div className="telemetry-header">
-              <span>( LIVE STUDIO STATUS )</span>
-              <span className="status-pulse">
-                <span className="status-pulse-dot" />2 SLOTS FOR Q4
-              </span>
-            </div>
-            <p style={{ fontSize: '0.96rem', lineHeight: 1.4, marginBottom: '0.9rem' }}>
-              Move your cursor across the canvas to peel back the surface. We fuse Swiss editorial
-              design, full-stack software, and autonomous AI systems.
-            </p>
-            <div className="telemetry-tags">
-              <span className="telemetry-tag">Web Design &amp; WebGL</span>
-              <span className="telemetry-tag">Custom Software</span>
-              <span className="telemetry-tag">AI Agents &amp; Workflows</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="hero-middle-bar">
-          <h1 className="hero-h1-label">
-            Web Design, Software Engineering &amp; AI Automation Studio
-          </h1>
-
-          <div className="hero-links-lang-row">
-            <div className="hero-social-Cluster">
-              <a
-                href="https://github.com/NikosKotsifas"
-                target="_blank"
-                rel="noreferrer"
-                className="editorial-link"
-              >
-                GitHub
-              </a>
-              <span>/</span>
-              <a href="#method" className="editorial-link">
-                Fixed-Fee Pricing
-              </a>
-              <span>/</span>
-              <button
-                type="button"
-                onClick={() => openContactWithPackage('Direct Inquiry')}
-                className="editorial-link"
-              >
-                Start a Project
-              </button>
-            </div>
-
-            <div className="hero-social-Cluster" style={{ fontFamily: 'var(--font-mono)' }}>
-              <button
-                type="button"
-                onClick={() => setLang('ENG')}
-                style={{
-                  fontWeight: lang === 'ENG' ? 700 : 400,
-                  textDecoration: lang === 'ENG' ? 'underline' : 'none'
-                }}
-              >
-                ENG
-              </button>
-              <span>·</span>
-              <button
-                type="button"
-                onClick={() => setLang('GR')}
-                style={{
-                  fontWeight: lang === 'GR' ? 700 : 400,
-                  textDecoration: lang === 'GR' ? 'underline' : 'none'
-                }}
-              >
-                GR
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div ref={heroWordmarkRef} className="hero-wordmark-container">
-          <SomeHowWordmark
-            className="somehow-hero-svg"
-            dotColor="#FF3B00"
-            interactiveHover={true}
-            onLetterEnter={handleWordmarkLetterHover}
-          />
-        </div>
-      </header>
-
-      {/* ====================================================================
-          SECTION 2: SHOWREEL & "( THE STEP ASIDE )"
-         ==================================================================== */}
-      <section className="section showreel">
-        <div className="container">
-          <h2 className="h1-home">
-            Most agencies ship templates.
-            <br />
-            We engineer breakthroughs.
-          </h2>
-
-          <div className="showreel-stage">
-            <div className="showreel-frame-wrap">
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '0.75rem'
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.76rem',
-                    color: '#D4FF00',
-                    letterSpacing: '0.08em'
-                  }}
-                >
-                  ● INTERACTIVE CAPABILITY REEL // 2026
-                </span>
-
-                <div style={{ display: 'flex', gap: '0.45rem' }}>
-                  {[
-                    { id: 'agents', label: '01 · AI Automation' },
-                    { id: 'webgl', label: '02 · Web & Shaders' },
-                    { id: 'saas', label: '03 · Full-Stack SaaS' }
-                  ].map((tab) => (
+      {/* Main Page Wrapper */}
+      <div id="top" className="page-wrapper">
+        <div className="main-wrapper">
+          <div className="page_view">
+            {/* 1. HERO LANDING SECTION — Black/Grey Architectural Grid + Continuously 3D-Transforming Logo */}
+            <section className="section-w">
+              <div className="section-fake-hero">
+                <div className="div-block">
+                  <div className="p-l">
+                    Not a template, a perspective.
+                    <br />
+                    Because Some.how is Every.how.
+                  </div>
+                  <div className="space-24" />
+                  <div className="hero-cta-row">
+                    <a
+                      href="#contact"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setContactOpen(true);
+                      }}
+                      className="btn black-blend"
+                    >
+                      <div className="btn__text">
+                        <p className="btn__text-p">book a call</p>
+                      </div>
+                      <div className="arrow-w">
+                        <div className="arrow black-blend">
+                          <div className="line-arrow" />
+                          <div className="shape-arrow" />
+                        </div>
+                      </div>
+                    </a>
                     <button
-                      key={tab.id}
                       type="button"
-                      onClick={() => setActiveReelMode(tab.id)}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.72rem',
-                        padding: '0.38rem 0.8rem',
-                        borderRadius: '999px',
-                        border: '1px solid rgba(244,241,234,0.22)',
-                        backgroundColor:
-                          activeReelMode === tab.id ? '#FF3B00' : 'rgba(244,241,234,0.06)',
-                        color: '#F4F1EA'
-                      }}
+                      className="replay-loader-pill"
+                      onClick={runLoaderSequence}
+                      title="Replay opening 3D sequence"
                     >
-                      {tab.label}
+                      replay intro ↻
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              {activeReelMode === 'agents' && (
-                <div className="showreel-Interactive-grid">
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">24/7</div>
-                    <div className="showreel-metric-label">
-                      Autonomous Multi-Agent Triage &amp; Execution
-                    </div>
-                  </div>
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">-82%</div>
-                    <div className="showreel-metric-label">
-                      Manual Ops Overhead Across CRM, ERP &amp; Support
-                    </div>
-                  </div>
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">&lt;1.2s</div>
-                    <div className="showreel-metric-label">
-                      RAG Knowledge Retrieval with Verifiable Citations
-                    </div>
                   </div>
                 </div>
-              )}
 
-              {activeReelMode === 'webgl' && (
-                <div className="showreel-Interactive-grid">
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">60fps</div>
-                    <div className="showreel-metric-label">
-                      Custom GLSL Shaders, GSAP Motion &amp; 3D Scenes
+                <div className="link-hero-bottom-w">
+                  <h1 className="h1">Web Design, Software &amp; AI Studio</h1>
+                  <div className="link-hero-lang-w">
+                    <div className="link-hero-w">
+                      <a
+                        href="https://github.com/NikosKotsifas"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="link"
+                      >
+                        <div>GitHub</div>
+                      </a>
+                      <span className="link pointer-none">/</span>
+                      <a
+                        href="#works"
+                        className="link"
+                      >
+                        <div>Selected Works</div>
+                      </a>
                     </div>
-                  </div>
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">99/100</div>
-                    <div className="showreel-metric-label">
-                      Lighthouse Performance &amp; Sub-Second First Paint
-                    </div>
-                  </div>
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">+190%</div>
-                    <div className="showreel-metric-label">
-                      Average Lift in Enterprise Demo Conversions
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeReelMode === 'saas' && (
-                <div className="showreel-Interactive-grid">
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">6 Wks</div>
-                    <div className="showreel-metric-label">
-                      From Blank Repo to Production Full-Stack Platform
-                    </div>
-                  </div>
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">100%</div>
-                    <div className="showreel-metric-label">
-                      IP Ownership, Clean TypeScript/Go/Python Codebase
-                    </div>
-                  </div>
-                  <div className="showreel-metric-card">
-                    <div className="showreel-metric-val">99.99%</div>
-                    <div className="showreel-metric-label">
-                      Edge-Deployed Reliability on Cloudflare &amp; AWS
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.74rem',
-                  color: 'rgba(244,241,234,0.6)'
-                }}
-              >
-                <span>STACK // REACT · NEXT.JS · GSAP · WEBGL · PYTHON · RUST · LLM AGENTS</span>
-                <span>SOME.HOW ARCHITECTURE v2.6</span>
-              </div>
-            </div>
-
-            <div className="showreel-aside-block">
-              <div className="mono-parenthetical">( The step aside )</div>
-              <p className="p-m">
-                In an era of infinite AI noise and cookie-cutter templates, the rarest asset is
-                clarity. Great interfaces shift perception, clean software scales effortlessly, and
-                intelligent automation frees humans to do only what humans can do.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          SECTION 3: KINETIC "W O R K S" GRID & ASYMMETRIC PORTFOLIO
-         ==================================================================== */}
-      <section id="works" ref={worksSectionRef} className="section works">
-        <div className="container">
-          <div className="works-word-w" aria-label="Works">
-            <div className="works-word-row">
-              <div className="works-word-cell">
-                <span className="works-letter">w</span>
-              </div>
-              <div className="works-word-cell">
-                <span className="works-letter">o</span>
-              </div>
-              <div className="works-word-cell">
-                <span className="works-letter accent-dot">r</span>
-              </div>
-              <div className="works-word-cell">
-                <span className="works-letter">k</span>
-              </div>
-              <div className="works-word-cell">
-                <span className="works-letter">s</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="works-section-header">
-            <h2 className="h3-style">
-              Good software functions.
-              <br />
-              Great systems feel like magic.
-            </h2>
-
-            <div className="work-filter-pills" role="tablist" aria-label="Filter projects">
-              {[
-                { id: 'ALL', label: 'All (06)' },
-                { id: 'WEB', label: 'Web & WebGL' },
-                { id: 'SOFTWARE', label: 'Software & SaaS' },
-                { id: 'AI', label: 'AI Automation' }
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setActiveFilter(f.id)}
-                  className={`filter-pill ${activeFilter === f.id ? 'active' : ''}`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 12-Column Asymmetric Works List (matching noth.in's exact layout grid) */}
-          <div className="work_list">
-            {filteredWorks.map((work, index) => {
-              const rowBase = Math.floor(index / 6) * 4 + work.rowOffset + 1;
-              return (
-                <article
-                  key={work.id}
-                  className="work_item"
-                  style={{
-                    gridColumn: activeFilter === 'ALL' ? work.col : index % 2 === 0 ? '1 / 7' : '7 / 13',
-                    gridRow: activeFilter === 'ALL' ? String(rowBase) : 'auto',
-                    alignSelf: work.alignSelf
-                  }}
-                >
-                  <div className="work-item-meta">
-                    <h3 className="title-work">{work.title}</h3>
-                    <span className="work-year-tag">
-                      ({work.number}) · {work.year}
-                    </span>
-                  </div>
-                  <p className="short-p-work">{work.subtitle}</p>
-
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setSelectedWork(work)}
-                    onKeyDown={(e) => e.key === 'Enter' && setSelectedWork(work)}
-                    className="work-link"
-                  >
-                    <div className="img-work-w" style={{ height: work.imgH }}>
-                      <ProjectVisualCard work={work} />
-                    </div>
-
-                    <div className="cursor-work">
-                      <span>inspect case</span>
-                      <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-                        <path d="M8.6 0.35L13.1 4.87L8.6 9.38" stroke="currentColor" strokeWidth="1.5" />
-                        <line y1="5" x2="13.1" y2="5" stroke="currentColor" strokeWidth="1.5" />
-                      </svg>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="work-view-all-w">
-            <button
-              type="button"
-              onClick={() => openContactWithPackage('Request Full Portfolio & Private Architecture Walkthrough')}
-              className="btn btn-outline"
-            >
-              <span>Request private case studies</span>
-              <svg width="24" height="12" viewBox="-8 -1 26 14" fill="none">
-                <polyline
-                  points="0.5,0 0.5,7.5 15.5,7.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill="none"
-                  strokeLinejoin="round"
-                />
-                <polyline
-                  points="12,4 15.5,7.5 12,11"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            <div>( 0{filteredWorks.length} DEPLOYED SYSTEMS )</div>
-            <div>© 25 . 26</div>
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          SECTION 4: ARCHITECTURAL GALLERY FRAME & FLOOR REFLECTION (.musee-w)
-         ==================================================================== */}
-      <section id="studio-video" ref={museeSectionRef} className="section-video-showcase">
-        <div className="musee-w">
-          <div ref={museeFrameRef} className="musee-frame-box">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.74rem',
-                color: 'rgba(244,241,234,0.65)'
-              }}
-            >
-              <span>MANIFESTO // SOME.HOW STUDIO</span>
-              <span style={{ color: '#D4FF00' }}>
-                {soundOn ? '♦ AUDIO SYNTH: ACTIVE (110Hz)' : '◊ AUDIO SYNTH: MUTED'}
-              </span>
-            </div>
-
-            <div style={{ my: 'auto' }}>
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.8rem',
-                  color: '#FF3B00',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  marginBottom: '0.8rem'
-                }}
-              >
-                ( The Some.how Doctrine )
-              </div>
-              <h3
-                style={{
-                  fontSize: '2.9rem',
-                  fontWeight: 500,
-                  lineHeight: 1.06,
-                  letterSpacing: '-0.03em',
-                  maxWidth: '42rem'
-                }}
-              >
-                We use autonomous AI to eliminate the mechanical—so human taste, architecture, and
-                direction can go further than ever before.
-              </h3>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderTop: '1px solid rgba(244,241,234,0.14)',
-                paddingTop: '1rem',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.75rem'
-              }}
-            >
-              <span>DESIGNED BY HUMANS · ACCELERATED BY AUTONOMOUS SYSTEMS</span>
-              <span style={{ color: '#FF3B00' }}>SOME.HOW // 2026</span>
-            </div>
-          </div>
-
-          <div className="musee-reflection" aria-hidden="true" />
-
-          <button
-            type="button"
-            onClick={toggleAmbientSound}
-            className={`btn-sound ${soundOn ? 'is-on' : ''}`}
-          >
-            <span>Sound</span>
-            <div className="toggle-sound">
-              <div className="tick-sound" />
-            </div>
-          </button>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          SECTION 5: "( THE STUDIO )" & REPULSIVE PHYSICS PLAYGROUND (.formes-w)
-         ==================================================================== */}
-      <section id="studio" className="section info-img">
-        <div className="container">
-          <div className="studio-intro-grid">
-            <div className="studio-intro-label mono-parenthetical">( The Studio )</div>
-            <div className="studio-intro-copy">
-              We called it <strong>Some.how</strong> because the most ambitious digital products
-              never start with a ready-made roadmap. They start as an open question—broad enough to
-              become a flagship website, a proprietary software platform, or an autonomous AI
-              workforce...
-            </div>
-          </div>
-
-          <div className="studio-parallax-pair">
-            <div className="studio-card-left">
-              <div
-                className="studio-visual-box"
-                style={{ backgroundColor: '#0D0D0D', color: '#F4F1EA' }}
-              >
-                <span className="mono-parenthetical" style={{ color: '#D4FF00' }}>
-                  01 // ENGINEERING PRECISION
-                </span>
-                <p style={{ fontSize: '1.85rem', lineHeight: 1.15, margin: '2rem 0' }}>
-                  Zero bloat. Sub-second load times, deterministic state machines, and interfaces
-                  that feel physical under the cursor.
-                </p>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', opacity: 0.6 }}>
-                  REACT · RUST · GO · WEBGL · GLSL
-                </span>
-              </div>
-              <p
-                style={{
-                  fontSize: '1.6rem',
-                  fontWeight: 500,
-                  marginTop: '1.2rem',
-                  letterSpacing: '-0.02em'
-                }}
-              >
-                ...or something nobody in your industry has dared to build yet.
-              </p>
-            </div>
-
-            <div className="studio-card-right">
-              <div
-                className="studio-visual-box"
-                style={{ backgroundColor: '#FF3B00', color: '#F4F1EA' }}
-              >
-                <span className="mono-parenthetical" style={{ color: '#0D0D0D', fontWeight: 700 }}>
-                  02 // AI-NATIVE VELOCITY
-                </span>
-                <p style={{ fontSize: '2rem', lineHeight: 1.12, margin: '2.5rem 0' }}>
-                  What traditional agencies quote at six months and €80k, we ship in weeks with a
-                  tight senior squad and custom internal AI tooling.
-                </p>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>
-                  FIXED SCOPE · ZERO DAY-RATES · DIRECT FOUNDER ACCESS
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '6rem' }}>
-            <h2 className="h1-home">
-              Systems follow
-              <br />
-              perspective.
-            </h2>
-          </div>
-
-          <div className="capabilities-grid">
-            <div className="capabilities-left">
-              <div style={{ fontSize: '1.6rem', fontWeight: 500 }}>We engineer :</div>
-              <p
-                style={{
-                  marginTop: '1rem',
-                  color: 'var(--ink-muted)',
-                  fontSize: '1.05rem',
-                  maxWidth: '22rem',
-                  lineHeight: 1.45
-                }}
-              >
-                Perspective is where product strategy, visual culture, and autonomous code meet.
-              </p>
-            </div>
-
-            <div className="capabilities-right">
-              {CAPABILITIES_LIST.map((cap) => (
-                <div key={cap.tag} className="capability-row">
-                  <div className="list-dot" style={{ backgroundColor: cap.accent }} />
-                  <div>
-                    <div style={{ fontSize: '1.65rem', fontWeight: 500, letterSpacing: '-0.02em' }}>
-                      {cap.title}
-                    </div>
-                    <p style={{ color: 'var(--ink-muted)', marginTop: '0.35rem', fontSize: '1rem' }}>
-                      {cap.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive Repulsive Physics Playground (.formes-w) */}
-          <div ref={formesWrapperRef} className="formes-w">
-            <div className="formes-hint">
-              ( Interactive Physics Field — Move cursor to scatter artifacts )
-            </div>
-
-            {PHYSICS_ITEMS.map((item) => (
-              <div
-                key={item.id}
-                className="formes-object"
-                data-base-rot={item.baseRot}
-                style={{
-                  left: item.left,
-                  top: item.top,
-                  transform: `rotate(${item.baseRot}deg)`
-                }}
-              >
-                {item.kind === 'artifact' ? (
-                  <TactileArtifact type={item.type} className="formes-artifact-item" />
-                ) : (
-                  <div
-                    className="formes-letter-badge"
-                    style={{ backgroundColor: item.bg, color: item.fg }}
-                  >
-                    {item.char}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Team & Creative/Engineering Partners */}
-          <div className="team-grid">
-            <div className="team-left">
-              <div style={{ fontSize: '1.6rem', fontWeight: 500 }}>
-                Some.how without people :
-              </div>
-            </div>
-
-            <div className="team-columns">
-              <div>
-                <h3 className="team-col-title">founders &amp; lead architecture</h3>
-                {TEAM_DATA.leadership.map((person) => (
-                  <div key={person.name} className="team-member-row">
-                    <span className="team-member-name">{person.name}</span>
-                    <span className="team-member-role">{person.role}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <h3 className="team-col-title">specialized engineering partners</h3>
-                {TEAM_DATA.partners.map((partner) => (
-                  <div key={partner.name} className="team-member-row">
-                    <span className="team-member-name">{partner.name}</span>
-                    <span className="team-member-role">{partner.role}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          SECTION 6: VELOCITY CHARACTER SCRAMBLE & GLITCH CASCADE (.section.glitch)
-         ==================================================================== */}
-      <section ref={glitchSectionRef} className="section glitch">
-        <div className="glitch-backdrop-grid" />
-        <div className="container glitch-stage">
-          <div className="glitch-stack-col">
-            {[
-              'we make it happen some.how',
-              'we make it happen some.how',
-              '0x7F !!” .   U§hs .   sys.compile() .   rh',
-              'we make it happen some.how',
-              'agent.dispatch() // shader.init() // 60fps',
-              'Pj(è !!” .   some.how .   jkj . k .   rh'
-            ].map((txt, idx) => (
-              <div
-                key={idx}
-                className="glitch-line-block glitch-scramble-line"
-                data-text={txt}
-              >
-                {txt}
-              </div>
-            ))}
-          </div>
-
-          <div className="glitch-final-col">
-            <div
-              className="mono-parenthetical"
-              style={{ color: '#D4FF00', marginBottom: '1rem' }}
-            >
-              ( BEYOND THE ORDINARY )
-            </div>
-            <div className="finaltext">
-              We build digital products, web flagships &amp; AI systems for those ready to outpace
-              their category.
-            </div>
-            <div style={{ marginTop: '2rem' }}>
-              <button
-                type="button"
-                onClick={() => openContactWithPackage('Custom Architecture & Product Build')}
-                className="btn btn-light"
-              >
-                <span>start a conversation</span>
-                <span className="arobase">→</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          SECTION 7: TRANSPARENT FIXED-FEE METHOD & PRICING CATALOG (#method)
-         ==================================================================== */}
-      <section id="method" className="section section-method">
-        <div className="container">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
-              flexWrap: 'wrap',
-              gap: '2rem'
-            }}
-          >
-            <div>
-              <div className="mono-parenthetical" style={{ marginBottom: '0.8rem' }}>
-                ( Transparent Fixed-Fee Method )
-              </div>
-              <h2 className="h1-home">
-                Priced by scope.
-                <br />
-                Never by the hour.
-              </h2>
-            </div>
-
-            <p style={{ maxWidth: '28rem', fontSize: '1.1rem', color: 'var(--ink-muted)' }}>
-              Inspired by radical studio transparency: every engagement is a fixed fee with clear
-              deliverables and launch dates locked in before we write a single line of code.
-            </p>
-          </div>
-
-          <div className="pricing-grid">
-            {PRICING_CATALOG.map((pkg) => (
-              <div key={pkg.id} className="pricing-card">
-                <div>
-                  <div className="pricing-type-tag">{pkg.type}</div>
-                  <h3 className="pricing-name">{pkg.name}</h3>
-                  <div className="pricing-price" style={{ color: pkg.accent === '#FF3B00' ? '#FF3B00' : 'inherit' }}>
-                    {pkg.price}
-                  </div>
-                  <div className="pricing-timeline">TIMELINE // {pkg.timeline}</div>
-                  <p className="pricing-desc">{pkg.description}</p>
-
-                  <ul className="pricing-includes">
-                    {pkg.includes.map((inc, i) => (
-                      <li key={i}>
-                        <span style={{ color: '#FF3B00', fontWeight: 700 }}>+</span>
-                        <span>{inc}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => openContactWithPackage(`${pkg.name} (${pkg.price})`)}
-                  className="btn"
-                  style={{ width: '100%', justifyContent: 'space-between' }}
-                >
-                  <span>select scope</span>
-                  <span>→</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          SECTION 8: DARK OBSIDIAN "F A Q S" ACCORDION (#faqs)
-         ==================================================================== */}
-      <section id="faqs" ref={faqSectionRef} className="section black">
-        <div className="container">
-          <div className="faq-giant-letters" aria-label="FAQs">
-            <div className="faq-title-section">F</div>
-            <div className="faq-title-section">A</div>
-            <div className="faq-title-section">Q</div>
-            <div className="faq-title-section" style={{ color: '#D4FF00' }}>
-              S
-            </div>
-          </div>
-
-          <div className="faq3_component">
-            <div className="faq3_content-left">
-              <div className="mono-parenthetical" style={{ color: 'rgba(244,241,234,0.6)' }}>
-                ( Questions we are asked )
-              </div>
-            </div>
-
-            <div className="faq3_content">
-              {FAQ_ITEMS.map((item, idx) => {
-                const isOpen = openFaqIdx === idx;
-                return (
-                  <div
-                    key={idx}
-                    className={`faq3_accordion ${isOpen ? 'is-open' : ''}`}
-                  >
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                      onKeyDown={(e) => e.key === 'Enter' && setOpenFaqIdx(isOpen ? -1 : idx)}
-                      className="faq3_question"
-                    >
-                      <div className="p-xl">{item.question}</div>
-                      <div className="faq3_icon-wrapper">
-                        <svg viewBox="0 0 12 12" fill="none" className="cross-faq">
-                          <rect y="5" width="12" height="2" fill="currentColor" />
-                          <rect
-                            x="7"
-                            width="12"
-                            height="2"
-                            transform={isOpen ? 'rotate(0 7 0)' : 'rotate(90 7 0)'}
-                            style={{
-                              opacity: isOpen ? 0 : 1,
-                              transition: 'opacity 0.3s ease'
-                            }}
-                            fill="currentColor"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <div className="faq-separator-w">
-                      <div className="faq-separator" />
-                    </div>
-
-                    <div
-                      className="faq3_answer"
-                      style={{
-                        maxHeight: isOpen ? '24rem' : '0rem',
-                        opacity: isOpen ? 1 : 0
-                      }}
-                    >
-                      <div className="faq3_answer-inner">
-                        <p>{item.answer}</p>
+                    <div className="lang-wrapper">
+                      <div className="lang-list">
+                        <span className="lang-link w--current">ENG</span>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+                </div>
+              </div>
 
-      {/* ====================================================================
-          SECTION 9: MONUMENTAL ELASTIC FOOTER
-         ==================================================================== */}
-      <footer id="footer" className="section-footer">
-        <div className="container">
-          <h2 className="h1-home">
-            Let’s make it happen,
-            <br />
-            some.how
-          </h2>
+              {/* Interactive Fluid Reveal Canvas + noth.in 3D background video */}
+              <FluidHeroCanvas />
 
-          <div className="footer-top-row">
-            <div className="footer-cta-group">
-              <button
-                type="button"
-                onClick={() => openContactWithPackage('Discovery Call — Footer CTA')}
-                className="btn"
-              >
-                <span>book a call</span>
-                <span className="arrow-w">
-                  <svg viewBox="0 0 18 12" fill="none" className="btn-arrow-svg">
-                    <path
-                      d="M11.5 1L16.5 6L11.5 11M16 6H1"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+              <section className="section hero-home">
+                <div className="container hero-home">
+                  <SomeHowHeroLogo revealed={heroRevealed} />
+                </div>
+              </section>
+            </section>
+
+            {/* 2. SHOWREEL SECTION (exact .section.showreel from noth.in) */}
+            <section className="section showreel">
+              <div className="container showreel">
+                <div className="space-150 mob-50" />
+                <h2 className="h1-home balance">
+                  Most brands produce content.
+                  <br />
+                  We prefer ideas.
+                </h2>
+                <div className="space-65" />
+                <div className="video-showreel-w">
+                  <div className="video-showreel-full-w">
+                    <video
+                      src={MEDIA_ASSETS.showreelVideo}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      crossOrigin="anonymous"
+                      className="showreel-light"
                     />
-                  </svg>
-                </span>
-              </button>
-
-              <a href="mailto:hello@some.how" className="btn btn-outline">
-                <span>drop us an email</span>
-                <span className="arobase">@</span>
-              </a>
-            </div>
-
-            <div className="footer-social-group">
-              <a
-                href="https://github.com/NikosKotsifas"
-                target="_blank"
-                rel="noreferrer"
-                className="editorial-link"
-              >
-                GitHub
-              </a>
-              <a href="#works" className="editorial-link">
-                LinkedIn
-              </a>
-              <a href="#works" className="editorial-link">
-                X / Twitter
-              </a>
-              <a href="#works" className="editorial-link">
-                Instagram
-              </a>
-            </div>
-          </div>
-
-          <div ref={footerWordmarkRef} className="footer-svg-w">
-            <SomeHowWordmark
-              className="footer-somehow-svg"
-              dotColor="#FF3B00"
-              interactiveHover={true}
-              onLetterEnter={handleWordmarkLetterHover}
-            />
-          </div>
-
-          <div className="footer-info-w">
-            <div>©2026 SOME.HOW STUDIO — FOUNDED BY NIKOS KOTSIFAS — ATHENS &amp; GLOBAL</div>
-            <div>WEB DESIGN · CUSTOM SOFTWARE · AI AUTOMATION</div>
-            <div className="footer-nav-links">
-              <a href="#works">WORKS</a>
-              <a href="#studio">STUDIO</a>
-              <a href="#method">PRICING</a>
-              <a href="#faqs">FAQS</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* ====================================================================
-          MODAL 1: CASE STUDY DEEP-DIVE DRAWER
-         ==================================================================== */}
-      {selectedWork && (
-        <div
-          className="modal-backdrop"
-          onClick={() => setSelectedWork(null)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="modal-drawer" onClick={(e) => e.stopPropagation()}>
-            <div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '2rem'
-                }}
-              >
-                <span className="mono-parenthetical">
-                  CASE STUDY // ({selectedWork.number}) · {selectedWork.year}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedWork(null)}
-                  className="modal-close-btn"
-                >
-                  Close [ESC]
-                </button>
+                  </div>
+                  <div className="video-showreel-flip p-m">
+                    <div>( The step aside )</div>
+                    <div className="text-block-2">
+                      In a world of infinite images, the rare thing is clarity. Design defends
+                      ideas, software shifts perception, and intelligent systems change how
+                      companies move.
+                    </div>
+                  </div>
+                </div>
               </div>
+            </section>
 
-              <h2 style={{ fontSize: '3rem', fontWeight: 600, letterSpacing: '-0.03em' }}>
-                {selectedWork.title}
-              </h2>
-              <p
-                style={{
-                  fontSize: '1.25rem',
-                  color: 'var(--ink-muted)',
-                  marginTop: '0.4rem',
-                  marginBottom: '1.5rem'
-                }}
-              >
-                {selectedWork.subtitle}
-              </p>
+            {/* 3. WORKS SECTION (exact #works.section.works from noth.in) */}
+            <section id="works" className="section works">
+              <div className="container works">
+                <div className="works-word-w">
+                  <div className="div-block-2">
+                    <div className="works-word-block-state1">
+                      <div className="works-word">w</div>
+                    </div>
+                    <div className="works-word-block-state1">
+                      <div className="works-word o">o</div>
+                    </div>
+                    <div className="works-word-block-state1">
+                      <div className="works-word r">r</div>
+                    </div>
+                    <div className="works-word-block-state1">
+                      <div className="works-word k">k</div>
+                    </div>
+                    <div className="works-word-block-state1">
+                      <div className="works-word">s</div>
+                    </div>
+                  </div>
+                </div>
 
-              <div style={{ borderRadius: '0.85rem', overflow: 'hidden', marginBottom: '2rem' }}>
-                <ProjectVisualCard work={selectedWork} />
-              </div>
+                <div className="space-87" />
+                <div className="titile-section-work">
+                  <h2 className="h3-style">
+                    Good brands communicate.
+                    <br />
+                    Great brands surprise.
+                  </h2>
+                </div>
 
-              <div className="mono-parenthetical" style={{ marginBottom: '0.6rem' }}>
-                ( Architecture &amp; Impact )
-              </div>
-              <p style={{ fontSize: '1.1rem', lineHeight: 1.55, marginBottom: '2rem' }}>
-                {selectedWork.summary}
-              </p>
+                <div className="work_list_w">
+                  <div role="list" className="work_list">
+                    {WORKS_ITEMS.map((item, idx) => {
+                      const row = Math.floor(idx / 6) * 4 + item.rowOffset + 1;
+                      return (
+                        <div
+                          key={item.id}
+                          role="listitem"
+                          className="work_item"
+                          style={{
+                            gridColumn: item.col,
+                            gridRow: String(row),
+                            alignSelf: item.alignSelf || 'end',
+                          }}
+                        >
+                          <h2 className="title-work">{item.title}</h2>
+                          <p className="short-p-work">{item.subtitle}</p>
+                          <a
+                            href={`#work-${item.id}`}
+                            className="work-link"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedWork(item);
+                            }}
+                          >
+                            <div className="img-work-w" style={{ height: item.imgH }}>
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                loading="lazy"
+                                className="img-work"
+                              />
+                            </div>
+                            <div className="cursor-work">
+                              <div>explore</div>
+                              <svg
+                                width="14"
+                                height="10"
+                                viewBox="0 0 14 10"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M8.60254 0.353516L13.1188 4.86981L8.60254 9.3861"
+                                  stroke="white"
+                                />
+                                <line y1="5.01562" x2="13.1188" y2="5.01562" stroke="white" />
+                              </svg>
+                            </div>
+                          </a>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
-              <div className="mono-parenthetical" style={{ marginBottom: '0.8rem' }}>
-                ( Key Deliverables )
-              </div>
-              <ul
-                style={{
-                  listStyle: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.6rem',
-                  marginBottom: '2rem'
-                }}
-              >
-                {selectedWork.deliverables.map((d, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      padding: '0.75rem 1rem',
-                      borderRadius: '0.5rem',
-                      backgroundColor: 'var(--bg-paper-warm)',
-                      border: '1px solid var(--border-subtle)',
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '0.82rem'
+                <div className="space-150 hide-tablet" />
+                <div className="space-150 mob-100" />
+                <div className="work-view-all-w">
+                  <a
+                    href="#contact"
+                    className="btn view-all-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setContactOpen(true);
                     }}
                   >
-                    0{i + 1} // {d}
-                  </li>
-                ))}
-              </ul>
-            </div>
+                    <div>Start a project</div>
+                    <div className="code-embed-2">
+                      <svg
+                        className="arrow-icon"
+                        width="24"
+                        height="12"
+                        viewBox="-8 -1 26 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <polyline
+                          className="arrow-shaft"
+                          points="0.5,0 0.5,7.5 15.5,7.5"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          fill="none"
+                          strokeLinejoin="round"
+                        />
+                        <polyline
+                          className="arrow-head"
+                          points="12,4 15.5,7.5 12,11"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  </a>
+                  <div className="nbr-works-w">
+                    <div className="div-block-3">
+                      <div>(</div>
+                      <div>05</div>
+                      <div>)</div>
+                    </div>
+                  </div>
+                  <div className="text-block-3">© 24 . 26</div>
+                </div>
+                <div className="space-150 mob-100" />
+              </div>
+            </section>
 
-            <div
-              style={{
-                borderTop: '1px solid var(--border-subtle)',
-                paddingTop: '1.5rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                Want something similar?
+            {/* 4. MANIFESTO / MUSEUM STICKY VIDEO SECTION (exact #studio-video from noth.in) */}
+            <section id="studio-video" className="section video">
+              <div className="container video">
+                <div className="musee-w">
+                  <img
+                    src={MEDIA_ASSETS.manifestoBg}
+                    loading="lazy"
+                    alt=""
+                    className="musee-bg"
+                  />
+                  <div className="video-w">
+                    <video
+                      ref={manifestoVideoRef}
+                      src={MEDIA_ASSETS.manifestoVideo}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      crossOrigin="anonymous"
+                      className="video-sticky"
+                    />
+                    <video
+                      ref={manifestoReflectRef}
+                      src={MEDIA_ASSETS.manifestoReflect}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      crossOrigin="anonymous"
+                      className="video-reflet"
+                    />
+                    <img
+                      src={MEDIA_ASSETS.manifestoFrame}
+                      loading="lazy"
+                      alt=""
+                      className="cadre-video"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className={`btn-sound ${soundOn ? 'is-on' : ''}`}
+                    onClick={handleToggleSound}
+                  >
+                    <div>Sound</div>
+                    <div className="toggle-sound">
+                      <div
+                        className="tick-sound"
+                        style={{
+                          transform: soundOn ? 'translateX(0.65rem)' : 'translateX(0)',
+                          transition: 'transform 0.3s ease',
+                        }}
+                      />
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* 5. THE STUDIO + REPULSIVE 3D ILLUSTRATIONS PLAYGROUND (exact #studio from noth.in) */}
+            <section id="studio" className="section info-img">
+              <div className="section-separator-blur" />
+              <div className="container">
+                <div className="space-87" />
+                <div className="info-w p-l">
+                  <div>( The Studio )</div>
+                  <div className="text-block-7">
+                    We called it Some.how because it started as a promise—an open architecture
+                    capable of becoming anything your ambition requires: a flagship website, a
+                    software platform, an autonomous AI system...
+                  </div>
+                  <div className="space-24" />
+                  <div className="space-24" />
+                  <div className="img-block-grid studio-parallax-pair">
+                    <div
+                      data-parallax-y="-100"
+                      data-parallax-scrub="1"
+                      className="img-block-left"
+                    >
+                      <div className="img-block-left-w">
+                        <img
+                          className="image"
+                          src={MEDIA_ASSETS.studioLeftImg}
+                          alt=""
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="text-block-4">
+                        or something
+                        <br />
+                        unexpected.
+                      </div>
+                    </div>
+                    <div
+                      data-parallax-y="-60"
+                      data-parallax-scrub="2"
+                      className="img-block-right-w"
+                    >
+                      <img
+                        className="image"
+                        src={MEDIA_ASSETS.studioRightImg}
+                        alt=""
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-150 hide-landscape" />
+                <div className="space-87" />
+                <h2 className="h1-home">
+                  Forms follow
+                  <br />
+                  perspective.
+                </h2>
+                <div className="space-87" />
+
+                <div className="infobusiness-grid">
+                  <div className="img-block-grid">
+                    <div className="info-grid-left">
+                      <div className="text-block-4">We design &amp; build :</div>
+                      <div className="fake-img" />
+                    </div>
+                    <div className="info-grid-right">
+                      <div className="div-block-4">
+                        <div className="list">
+                          {STUDIO_SERVICES.map((srv) => (
+                            <div key={srv} className="list-item">
+                              <div className="list-dot" />
+                              <div>{srv}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="hide-tablet">
+                          Perspective is where engineering
+                          <br />
+                          meets visual culture.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-87" />
+
+                {/* Exact .formes-w 3D Repulsive Playground with noth.in's 3D sculptural objects + SOME.HOW letter cursors */}
+                <div ref={formesRef} className="formes-w">
+                  <img
+                    src={LOADER_3D_OBJECTS[1].src}
+                    loading="lazy"
+                    alt={LOADER_3D_OBJECTS[1].alt}
+                    className="papier-form"
+                  />
+                  <img
+                    src={LOADER_3D_OBJECTS[5].src}
+                    loading="lazy"
+                    alt={LOADER_3D_OBJECTS[5].alt}
+                    className="chewing-gum"
+                  />
+                  <img
+                    src={LOADER_3D_OBJECTS[4].src}
+                    loading="lazy"
+                    alt={LOADER_3D_OBJECTS[4].alt}
+                    className="bonbon-copy"
+                  />
+                  <img
+                    src={LOADER_3D_OBJECTS[2].src}
+                    loading="lazy"
+                    alt={LOADER_3D_OBJECTS[2].alt}
+                    className="etoile"
+                  />
+                  <img
+                    src={LOADER_3D_OBJECTS[0].src}
+                    loading="lazy"
+                    alt={LOADER_3D_OBJECTS[0].alt}
+                    className="coeur-copy"
+                  />
+                  {/* Floating vector letter cursors matching .n-cursor, .t-cursor, .h-cursor, .apos-cursor, .i-cursor */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100%"
+                    viewBox="0 0 62 69"
+                    fill="none"
+                    className="n-cursor _2"
+                  >
+                    <path
+                      d="M45.2833 0.043432C45.7249 -0.0847957 46.0096 0.0711954 46.1374 0.511405L61.9272 54.8902C62.055 55.3304 61.8981 55.6146 61.4565 55.7429L50.1176 59.0353C49.8578 59.1107 49.6497 59.0729 49.4931 58.9218L22.8641 37.9303C22.581 37.7317 22.2987 37.7294 22.0171 37.9235C21.7279 38.0917 21.6322 38.3441 21.7299 38.6808L29.4577 64.2761C29.5931 64.7422 29.4399 65.0394 28.9983 65.1676L16.7242 68.7316C16.2566 68.8674 15.9589 68.7152 15.8311 68.275L0.0413424 13.8962C-0.0864795 13.4559 0.0834018 13.168 0.550987 13.0322L11.7341 9.785C11.9938 9.70957 12.2187 9.75657 12.4088 9.92602L39.7022 32.9147C39.9593 33.1208 40.2324 33.1398 40.5215 32.9716C40.8292 32.77 40.9341 32.5008 40.8364 32.1642L32.4995 4.47139C32.3717 4.03118 32.5286 3.74696 32.9702 3.61873L45.2833 0.043432Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100%"
+                    viewBox="0 0 62 69"
+                    fill="none"
+                    className="n-cursor"
+                  >
+                    <path
+                      d="M45.2833 0.043432C45.7249 -0.0847957 46.0096 0.0711954 46.1374 0.511405L61.9272 54.8902C62.055 55.3304 61.8981 55.6146 61.4565 55.7429L50.1176 59.0353C49.8578 59.1107 49.6497 59.0729 49.4931 58.9218L22.8641 37.9303C22.581 37.7317 22.2987 37.7294 22.0171 37.9235C21.7279 38.0917 21.6322 38.3441 21.7299 38.6808L29.4577 64.2761C29.5931 64.7422 29.4399 65.0394 28.9983 65.1676L16.7242 68.7316C16.2566 68.8674 15.9589 68.7152 15.8311 68.275L0.0413424 13.8962C-0.0864795 13.4559 0.0834018 13.168 0.550987 13.0322L11.7341 9.785C11.9938 9.70957 12.2187 9.75657 12.4088 9.92602L39.7022 32.9147C39.9593 33.1208 40.2324 33.1398 40.5215 32.9716C40.8292 32.77 40.9341 32.5008 40.8364 32.1642L32.4995 4.47139C32.3717 4.03118 32.5286 3.74696 32.9702 3.61873L45.2833 0.043432Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100%"
+                    viewBox="0 0 31 33"
+                    fill="none"
+                    className="t-cursor"
+                  >
+                    <path
+                      d="M11.5142 28.4178L6.17276 25.0772L16.7141 8.22217L10.5419 4.36195L13.27 -0.000193374L30.9263 11.0423L28.1982 15.4044L22.0555 11.5628L11.5142 28.4178Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100%"
+                    viewBox="0 0 17 18"
+                    fill="none"
+                    className="h-cursor"
+                  >
+                    <path
+                      d="M8.89896 16.4842L5.58487 17.8902L2.76937e-06 4.72589L3.3141 3.31992L5.50118 8.47517L10.012 6.56148L7.82495 1.40622L11.139 0.000241487L16.7239 13.1646L13.4098 14.5705L11.1602 9.26799L6.64939 11.1817L8.89896 16.4842Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100%"
+                    viewBox="0 0 24 25"
+                    fill="none"
+                    className="apos-cursor"
+                  >
+                    <path
+                      d="M23.0424 2.76167C23.2441 2.80736 23.3872 2.93582 23.4719 3.14704C23.5817 3.36397 23.5878 3.5711 23.4901 3.76843L9.45106 23.7966C9.30448 24.0926 9.05475 24.2006 8.70184 24.1207L0.53459 22.2701C0.332929 22.2244 0.174224 22.1061 0.0584542 21.9153C-0.0261954 21.7041 -0.019669 21.4998 0.0780476 21.3025L10.1758 0.422389C10.3594 0.079915 10.6151 -0.054197 10.9428 0.0200552L23.0424 2.76167Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100%"
+                    viewBox="0 0 13 22"
+                    fill="none"
+                    className="i-cursor"
+                  >
+                    <path
+                      d="M5.03568 21.9525L9.34553e-05 20.0024L7.74633 -8.77758e-05L12.7819 1.95001L5.03568 21.9525Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+
+                <div className="infobusiness-grid">
+                  <div className="img-block-grid p-s">
+                    <div className="info-grid-left">
+                      <div className="text-block-4 marg-40">Some.how without people :</div>
+                      <div className="fake-img" />
+                    </div>
+                    <div className="info-grid-right second">
+                      <div className="div-block-4">
+                        <div className="list">
+                          <h2 className="title-work info-team">direction &amp; engineering</h2>
+                          <div className="list-item">
+                            <div>Nikos Kotsifas</div>
+                          </div>
+                          <div className="list-item">
+                            <div>Creative Direction</div>
+                          </div>
+                          <div className="list-item">
+                            <div>Full-Stack Systems</div>
+                          </div>
+                        </div>
+                        <div>
+                          <h2 className="title-work info-team">capabilities</h2>
+                          <div className="list-item">
+                            <div>WebGL &amp; Motion</div>
+                          </div>
+                          <div className="list-item">
+                            <div>AI Automation</div>
+                          </div>
+                          <div className="list-item">
+                            <div>Brand Architecture</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-87 hide-landscape" />
+              </div>
+            </section>
+
+            {/* 6. GLITCH SECTION (exact .section.glitch from noth.in) */}
+            <section ref={glitchSectionRef} className="section glitch">
+              <div className="glitch-img-w">
+                <img
+                  src={MEDIA_ASSETS.glitchBgImg}
+                  loading="lazy"
+                  alt=""
+                  className="img-ascenseur"
+                />
+              </div>
+              <div className="glitch-text-w">
+                <div className="glitch-text-sticky-w">
+                  <div className="div-block-5">
+                    <div className="text-block-6 _3">
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      Pj(è !!” . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;U§hs . &nbsp;&nbsp;jkj . k . &nbsp;&nbsp;&nbsp;rh
+                    </div>
+                  </div>
+                  <div className="div-block-5">
+                    <div className="text-block-6 _1">
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      Pj(è !!” . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;U§hs . &nbsp;&nbsp;jkj . k . &nbsp;&nbsp;&nbsp;rh
+                    </div>
+                  </div>
+                  <div className="div-block-5">
+                    <div className="text-block-6 _2">
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      Pj(è !!” . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;U§hs . &nbsp;&nbsp;jkj . k . &nbsp;&nbsp;&nbsp;rh
+                    </div>
+                  </div>
+                  <div className="div-block-5">
+                    <div className="text-block-6 _4">
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      Pj(è !!” . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;U§hs . &nbsp;&nbsp;jkj . k . &nbsp;&nbsp;&nbsp;rh
+                    </div>
+                  </div>
+                  <div className="div-block-5 none">
+                    <div className="text-block-6">
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      we are some.how
+                    </div>
+                  </div>
+                  <div className="div-block-5">
+                    <div className="text-block-6 _6">
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      we are some.how
+                      <br />
+                      Pj(è !!” . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;U§hs . &nbsp;&nbsp;jkj . k . &nbsp;&nbsp;&nbsp;rh
+                    </div>
+                  </div>
+                  <div className="finaltext">
+                    We create digital
+                    <br />
+                    experiences for
+                    <br />
+                    those ready to go
+                    <br />
+                    beyond the
+                    <br />
+                    ordinary.
+                  </div>
+                </div>
+                <div className="img-glitch-w">
+                  <div className="merguez">
+                    <img
+                      className="merguez-img"
+                      src={MEDIA_ASSETS.glitchLeftImg}
+                      alt=""
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="ballon">
+                    <img
+                      className="ballon-img"
+                      src={MEDIA_ASSETS.glitchRightImg}
+                      alt=""
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 7. MINIMAL DARK FAQS SECTION (exact .section.black from noth.in) */}
+            <section id="faqs" className="section black">
+              <div className="container">
+                <div className="div-block-12">
+                  <div className="faq-title-section">F</div>
+                  <div className="faq-title-section faq-col-5">A</div>
+                  <div className="faq-title-section faq-col-9">Q</div>
+                  <div className="faq-title-section faq-col-12">S</div>
+                </div>
+                <div className="faq3_component">
+                  <div className="faq3_content-left">
+                    <div className="margin-bottom margin-small">
+                      <div className="p-m">( Questions we are asked )</div>
+                    </div>
+                  </div>
+                  <div className="faq3_content">
+                    <div role="list" className="faq3_list">
+                      {FAQS.map((faq, idx) => {
+                        const isOpen = openFaq === idx;
+                        return (
+                          <div key={faq.q} role="listitem" className="w-dyn-item">
+                            <div className="faq3_accordion">
+                              <div
+                                className="faq3_question"
+                                onClick={() => setOpenFaq(isOpen ? null : idx)}
+                              >
+                                <div
+                                  className="p-xl"
+                                  style={{
+                                    opacity: isOpen ? 1 : 0.55,
+                                    transition: 'opacity 0.4s ease',
+                                  }}
+                                >
+                                  {faq.q}
+                                </div>
+                                <div className="faq3_icon-wrapper">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="100%"
+                                    viewBox="0 0 12 12"
+                                    fill="none"
+                                    className="cross-faq"
+                                  >
+                                    <rect y="5" width="12" height="2" fill="currentColor" />
+                                    <rect
+                                      x="7"
+                                      width="12"
+                                      height="2"
+                                      transform="rotate(90 7 0)"
+                                      fill="currentColor"
+                                      style={{
+                                        transformOrigin: '6px 6px',
+                                        transform: isOpen
+                                          ? 'rotate(90deg) scaleX(0)'
+                                          : 'rotate(90deg) scaleX(1)',
+                                        transition: 'transform 0.4s ease',
+                                      }}
+                                    />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div
+                                className="faq-separator-w"
+                                style={{
+                                  opacity: isOpen ? 1 : 0.2,
+                                  transition: 'opacity 0.4s ease',
+                                }}
+                              >
+                                <div className="faq-separator" />
+                              </div>
+                              <div
+                                className="faq3_answer"
+                                style={{
+                                  maxHeight: isOpen ? '16rem' : '0rem',
+                                  opacity: isOpen ? 1 : 0,
+                                  transition:
+                                    'max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease',
+                                }}
+                              >
+                                <p>{faq.a}</p>
+                              </div>
+                              <div
+                                className="spacing-faq"
+                                style={{
+                                  height: isOpen ? '3.5rem' : '1.75rem',
+                                  transition: 'height 0.4s ease',
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 8. FOOTER (exact #footer.section-footer from noth.in) */}
+            <footer id="footer" className="section-footer">
+              <div className="container footer-c">
+                <div>
+                  <h2 className="h1-home">
+                    Let’s start
+                    <br />
+                    from some.how
+                  </h2>
+                  <div className="space-24" />
+                  <div className="div-block-7">
+                    <div className="div-block-6 mob">
+                      <a
+                        href="#contact"
+                        className="btn"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setContactOpen(true);
+                        }}
+                      >
+                        <div className="btn__text">
+                          <p className="btn__text-p">book a call</p>
+                        </div>
+                        <div className="arrow-w">
+                          <div className="arrow">
+                            <div className="line-arrow" />
+                            <div className="shape-arrow" />
+                          </div>
+                        </div>
+                      </a>
+                      <a href="mailto:hello@some.how" className="btn email">
+                        <div className="btn__text">
+                          <p className="btn__text-p">drop us an email</p>
+                        </div>
+                        <div className="arobase">@</div>
+                      </a>
+                    </div>
+                    <div className="social-links-w">
+                      <a
+                        href="https://github.com/NikosKotsifas"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="link footer"
+                      >
+                        <div className="pointer-none">GitHub</div>
+                      </a>
+                      <a href="#works" className="link footer">
+                        <div className="pointer-none">Linkedin</div>
+                      </a>
+                      <a href="#studio" className="link footer">
+                        <div className="pointer-none">Instagram</div>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="space-150 mob-100" />
+                  <SomeHowFooterLogo />
+                  <div className="space-12" />
+                </div>
+
+                <div className="footer-info-w">
+                  <div className="div-block-17">
+                    <h2 className="footer-info">©2026 — SOME.HOW Studio — All Rights Reserved</h2>
+                    <h2 className="footer-info hide-tablet">
+                      Web Design, Custom Software &amp; AI Automation
+                    </h2>
+                  </div>
+                  <div className="footer-link-new">
+                    <a href="#works" className="link-footer">
+                      <strong>WORKS</strong>
+                    </a>
+                    <a href="#studio" className="link-footer">
+                      <strong>STUDIO</strong>
+                    </a>
+                    <a
+                      href="#contact"
+                      className="link-footer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setContactOpen(true);
+                      }}
+                    >
+                      <strong>CONTACT</strong>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+
+      {/* Minimal Case Study Modal when clicking any project */}
+      {selectedWork && (
+        <div className="minimal-modal-backdrop" onClick={() => setSelectedWork(null)}>
+          <div className="minimal-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="minimal-modal-top">
+              <span className="title-work">
+                {selectedWork.category} — {selectedWork.year}
               </span>
               <button
                 type="button"
-                onClick={() => {
-                  const title = selectedWork.title;
-                  setSelectedWork(null);
-                  openContactWithPackage(`Similar to ${title}`);
-                }}
-                className="btn"
+                className="minimal-modal-close"
+                onClick={() => setSelectedWork(null)}
               >
-                <span>scope a project like this</span>
-                <span>→</span>
+                CLOSE ✕
+              </button>
+            </div>
+            <h3 className="h3-style" style={{ marginBottom: '1rem' }}>
+              {selectedWork.title} — {selectedWork.subtitle}
+            </h3>
+            <p className="p-m" style={{ color: '#b5b5b5', marginBottom: '1.5rem' }}>
+              {selectedWork.summary}
+            </p>
+            <div className="minimal-modal-img-w">
+              <img src={selectedWork.image} alt={selectedWork.title} />
+            </div>
+            <div className="minimal-modal-footer">
+              <div className="minimal-tags">
+                {selectedWork.deliverables.map((d) => (
+                  <span key={d} className="minimal-tag">
+                    {d}
+                  </span>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="btn black-blend"
+                onClick={() => {
+                  setSelectedWork(null);
+                  setContactOpen(true);
+                }}
+              >
+                <div className="btn__text">
+                  <p className="btn__text-p">build something similar</p>
+                </div>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ====================================================================
-          MODAL 2: INTERACTIVE PROJECT & DISCOVERY CALL DRAWER
-         ==================================================================== */}
-      {contactModalOpen && (
-        <div
-          className="modal-backdrop"
-          onClick={() => setContactModalOpen(false)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="modal-drawer" onClick={(e) => e.stopPropagation()}>
-            <div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '2rem'
-                }}
+      {/* Minimal Contact / Discovery Call Modal */}
+      {contactOpen && (
+        <div className="minimal-modal-backdrop" onClick={() => setContactOpen(false)}>
+          <div className="minimal-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="minimal-modal-top">
+              <span className="title-work">( Start a conversation )</span>
+              <button
+                type="button"
+                className="minimal-modal-close"
+                onClick={() => setContactOpen(false)}
               >
-                <span className="mono-parenthetical">( START A PROJECT // SOME.HOW )</span>
-                <button
-                  type="button"
-                  onClick={() => setContactModalOpen(false)}
-                  className="modal-close-btn"
-                >
-                  Close [ESC]
-                </button>
-              </div>
-
-              <h2 style={{ fontSize: '2.6rem', fontWeight: 600, letterSpacing: '-0.03em' }}>
-                Let’s build it, some.how.
-              </h2>
-              <p style={{ color: 'var(--ink-muted)', marginTop: '0.5rem', fontSize: '1.05rem' }}>
-                Tell us what is at stake. We respond within 24 hours with a concrete architectural
-                perspective and fixed-fee scope.
-              </p>
-
-              {contactSubmitted ? (
-                <div
-                  style={{
-                    marginTop: '2.5rem',
-                    padding: '2rem',
-                    borderRadius: '1rem',
-                    backgroundColor: '#0D0D0D',
-                    color: '#F4F1EA'
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      color: '#D4FF00',
-                      fontSize: '0.8rem',
-                      marginBottom: '0.6rem'
-                    }}
-                  >
-                    ✓ TRANSMISSION RECEIVED
-                  </div>
-                  <h3 style={{ fontSize: '1.6rem', marginBottom: '0.6rem' }}>
-                    We’ve locked in your inquiry.
-                  </h3>
-                  <p style={{ opacity: 0.8, lineHeight: 1.5 }}>
-                    Selected Scope: <strong>{selectedPackage}</strong>. Nikos will review your brief
-                    and reach out shortly.
-                  </p>
-                </div>
-              ) : (
-                <form
-                  className="contact-form-grid"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setContactSubmitted(true);
-                  }}
-                >
-                  <div className="form-field">
-                    <label>Your Name</label>
-                    <input type="text" required placeholder="Alex Mercer" />
-                  </div>
-
-                  <div className="form-field">
-                    <label>Work Email</label>
-                    <input type="email" required placeholder="alex@company.com" />
-                  </div>
-
-                  <div className="form-field">
-                    <label>Selected Scope / Package</label>
-                    <select
-                      value={selectedPackage}
-                      onChange={(e) => setSelectedPackage(e.target.value)}
-                    >
-                      <option value="Interactive Web Flagship (€4,500)">
-                        Interactive Web Flagship (from €4,500)
-                      </option>
-                      <option value="Custom Software / SaaS Platform (€9,500)">
-                        Custom Software / SaaS Platform (from €9,500)
-                      </option>
-                      <option value="AI Automation & Agent Systems (€3,500)">
-                        AI Automation &amp; Agent Systems (from €3,500)
-                      </option>
-                      <option value="Embedded Studio Partner (€3,000 / mo)">
-                        Embedded Studio Partner (€3,000 / mo)
-                      </option>
-                      <option value="Custom Multi-Discipline Scope">
-                        Custom Multi-Discipline Scope
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="form-field">
-                    <label>What are we building or automating?</label>
-                    <textarea
-                      rows={4}
-                      required
-                      placeholder="Tell us about your product, timeline, or the workflow you want to automate..."
-                    />
-                  </div>
-
-                  <button type="submit" className="btn" style={{ justifyContent: 'center' }}>
-                    <span>send project brief</span>
-                    <span>→</span>
-                  </button>
-                </form>
-              )}
+                CLOSE ✕
+              </button>
             </div>
-
-            <div
-              style={{
-                borderTop: '1px solid var(--border-subtle)',
-                paddingTop: '1.2rem',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.75rem',
-                color: 'var(--ink-muted)'
+            <h3 className="h3-style" style={{ marginBottom: '0.75rem' }}>
+              Let’s build your unfair advantage.
+            </h3>
+            <p className="p-m" style={{ color: '#a8a8a8', marginBottom: '1.75rem' }}>
+              Tell us what you are building—flagship website, custom software, or AI workflow—and
+              we’ll reply within 24 hours with a clear scope.
+            </p>
+            <form
+              className="minimal-contact-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setContactOpen(false);
               }}
             >
-              DIRECT EMAIL // HELLO@SOME.HOW · GITHUB // @NIKOSKOTSIFAS
-            </div>
+              <input type="text" placeholder="Your name & company" required />
+              <input type="email" placeholder="Your email" required />
+              <textarea rows={3} placeholder="What are we building together?" required />
+              <button type="submit" className="btn black-blend">
+                <div className="btn__text">
+                  <p className="btn__text-p">send brief →</p>
+                </div>
+              </button>
+            </form>
           </div>
         </div>
       )}

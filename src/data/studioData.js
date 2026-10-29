@@ -1,299 +1,201 @@
-export const WORKS_DATA = [
+// All 12 original 3D sculptural & illustration assets from noth.in
+export const LOADER_3D_OBJECTS = [
   {
-    id: 'kinetix',
-    number: '01',
-    title: 'Kinetix_OS',
-    subtitle: 'Autonomous orchestration for global freight & supply chains.',
-    category: 'AI Automation · Rust & React',
-    year: '2026',
-    col: '1 / 7',
-    rowOffset: 0,
-    alignSelf: 'start',
-    imgH: '43.125rem',
-    parallaxY: 80,
-    accent: '#D4FF00',
-    palette: ['#0E100F', '#1A2418', '#D4FF00'],
-    metrics: ['94% faster dispatch', '14.2M daily events', 'Zero manual triage'],
-    summary:
-      'We replaced 40+ fragmented spreadsheets and legacy ERP webhooks with a single multi-agent command plane that predicts port bottlenecks, negotiates carrier rates autonomously, and surfaces human-in-the-loop exceptions in real time.',
-    deliverables: [
-      'Multi-Agent LLM Orchestration Engine',
-      'Real-Time Spatial Telemetry Dashboard',
-      'Custom Design System & WebGL Globe',
-      'ERP & EDI Automated Bridge'
-    ],
-    livePreviewType: 'telemetry'
+    id: 'coeur',
+    cls: 'coeur',
+    alt: 'Black and white heart shape wrapped in bubble wrap',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a101bf4026551468ed05521_coeur-bulle-nb.webp',
   },
   {
-    id: 'aether',
-    number: '02',
-    title: 'Aether Studio',
-    subtitle: 'Where spatial canvas meets generative product architecture.',
-    category: 'Web Experience · WebGL & Shaders',
+    id: 'papier',
+    cls: 'papier',
+    alt: 'Crinkled shiny metallic blue foil forming a star-like abstract shape',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a101bf3288a762026817436_papier-froisse.webp',
+  },
+  {
+    id: 'star',
+    cls: 'star',
+    alt: 'Black shiny balloon shaped like an asterisk symbol',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a101bf33377567d8f2bd507_asterix.webp',
+  },
+  {
+    id: 'smiley',
+    cls: 'bonbon',
+    alt: 'Crinkled metallic foil shaped like a smiley face',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a7084cbb4dfa4268c289f_smiley.webp',
+  },
+  {
+    id: 'bonbon',
+    cls: 'bonbon-copy',
+    alt: 'Candy wrapped in shiny crinkled silver foil',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a101bf4d60716b3d6959657_bonbon.webp',
+  },
+  {
+    id: 'chwing',
+    cls: 'chewinggum',
+    alt: 'Textured dollop of glossy pink cream',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a101c34913dd6111b16324e_chwing.webp',
+  },
+  {
+    id: 'sac-plastic',
+    cls: 'papier',
+    alt: 'Shiny black plastic shopping bag sculpture',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a708485f3984771b5bfc0_sac-plastic.webp',
+  },
+  {
+    id: 'chien',
+    cls: 'papier',
+    alt: 'Shiny pink balloon sculpture shaped like a dog',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a708485f3984771b5bfd6_chien.webp',
+  },
+  {
+    id: 'piniata',
+    cls: 'papier',
+    alt: 'Shiny silver metallic fringe sculpture',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a7084f7d5b72a2a90fb9f_piniata.webp',
+  },
+  {
+    id: 'ballon',
+    cls: 'papier',
+    alt: 'Deflated pink balloon with glossy wrinkles and folds',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a7084cd10902f9b8c60cb_ballon.webp',
+  },
+  {
+    id: 'cube',
+    cls: 'papier',
+    alt: 'Shiny blue inflated cube-shaped object with creases',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a70847eeb828c7456d387_cube.webp',
+  },
+  {
+    id: 'bouee',
+    cls: 'papier',
+    alt: 'Inflatable shiny mauve ring float',
+    src: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3a70843445399a04fbee92_bouee.webp',
+  },
+];
+
+// Media assets matching noth.in's exact visual pipeline
+export const MEDIA_ASSETS = {
+  heroVideo: 'https://noth-in.b-cdn.net/nothin-sharp-high.mp4',
+  showreelVideo: 'https://noth-in.b-cdn.net/showreel-nothin_DEF.mp4',
+  manifestoBg: 'https://noth-in.b-cdn.net/freepik__photography-frontal-shot-of-a-huge-large-169-white__495122.webp',
+  manifestoVideo: 'https://noth-in.b-cdn.net/NOTHIN_MANIFESTE_CLEAN.mp4',
+  manifestoReflect: 'https://noth-in.b-cdn.net/NOTHIN_MANIFESTE_REFLECT_H265.mp4',
+  manifestoFrame: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a281a4f86f15756a04aa88e_test-cadre-transparent.webp',
+  studioLeftImg: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3171d9fb2a39d8054e9252_beton-plastic-V2.webp',
+  studioRightImg: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a317205d7b275b2d2985000_boule-chelou-coline-V2.webp',
+  glitchBgImg: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a32453603101dc16b515779_a69d519b418ba234ececf4336989bfd0_260407_NOTHIN_KV08_1X1.webp',
+  glitchLeftImg: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a31722974b25426299f5e83_saussice-V2.webp',
+  glitchRightImg: 'https://cdn.prod.website-files.com/6a0c501c42b9751b78a9d1a7/6a3172364e89f407c6f0469a_ballon-bureau-V2.webp',
+};
+
+// Minimal 5-project asymmetric portfolio matching noth.in's exact grid & vignettes
+export const WORKS_ITEMS = [
+  {
+    id: 'utopia',
+    title: 'Utopia',
+    subtitle: 'Where taste meets autonomous intelligence.',
+    category: 'Web Design & AI System',
     year: '2026',
+    image: 'https://cdn.prod.website-files.com/6a2679b9acc91890e34df140/6a319bb9740ace5d22b1065c_work-vignette-utopia-V2.webp',
+    col: '1 / 7',
+    rowOffset: 0,
+    alignSelf: '',
+    imgH: '43.125rem',
+    parallaxY: 80,
+    clipInitial: 'inset(100% 100% 0% 0%)',
+    summary: 'Bespoke WebGL flagship and autonomous client-onboarding engine built for a luxury cultural platform.',
+    deliverables: ['Art Direction', 'WebGL Flagship', 'AI Concierge'],
+  },
+  {
+    id: 'aurbse',
+    title: 'Aurbse',
+    subtitle: 'A living instrument for reading territory.',
+    category: 'Software & Data Visualization',
+    year: '2026',
+    image: 'https://cdn.prod.website-files.com/6a2679b9acc91890e34df140/6a319bce1522d2bb4973451c_work-vignette-aurbse-V2.webp',
     col: '9 / 13',
     rowOffset: 0,
     alignSelf: 'end',
     imgH: '26.875rem',
     parallaxY: -150,
-    accent: '#FF3B00',
-    palette: ['#140B08', '#33150C', '#FF3B00'],
-    metrics: ['3.8x session depth', '60fps fluid canvas', '+210% inbound demos'],
-    summary:
-      'An editorial product flagship for a spatial computing startup. Built with custom GLSL fluid shaders, kinetic Swiss typography, and zero-latency interactive sandboxes embedded directly in the landing experience.',
-    deliverables: [
-      'Interactive Brand & Web Flagship',
-      'Custom GLSL Shader Pipeline',
-      'GSAP Kinetic Typography System',
-      'Headless CMS & Multi-Locale Engine'
-    ],
-    livePreviewType: 'shader'
-  },
-  {
-    id: 'vanguard',
-    number: '03',
-    title: 'Vanguard_Pay',
-    subtitle: 'Swiss clarity for high-frequency institutional treasury.',
-    category: 'Software Development · FinTech SaaS',
-    year: '2026',
-    col: '3 / 11',
-    rowOffset: 1,
-    alignSelf: 'start',
-    imgH: '42.25rem',
-    parallaxY: -100,
-    accent: '#F4F1EA',
-    palette: ['#0B0C0E', '#181B22', '#FF3B00'],
-    metrics: ['$4.8B routed volume', '<12ms UI latency', 'SOC2 Type II ready'],
-    summary:
-      'Institutional liquidity software usually looks like a 1998 cockpit. We stripped Vanguard down to first principles: a keyboard-first command palette, deterministic ledger streaming, and Swiss-grid visual hierarchy.',
-    deliverables: [
-      'Full-Stack Treasury Web Application',
-      'Sub-15ms Streaming Orderbook UI',
-      'Automated Compliance & Audit Agents',
-      'Design Token Architecture (Figma → Code)'
-    ],
-    livePreviewType: 'ledger'
+    clipInitial: 'inset(100% 0% 0% 100%)',
+    summary: 'Real-time spatial intelligence software and interactive cartography platform.',
+    deliverables: ['Full-Stack SaaS', 'Spatial WebGL', 'Design System'],
   },
   {
     id: 'in-cognita',
-    number: '04',
     title: 'In_Cognita',
-    subtitle: 'Seize the unexpected: dark-data intelligence made visible.',
-    category: 'AI Pipeline · Knowledge Graph',
-    year: '2025',
+    subtitle: 'Seize the unexpected: the invisible, made visible.',
+    category: 'Brand, Web & AI Automation',
+    year: '2026',
+    image: 'https://cdn.prod.website-files.com/6a2679b9acc91890e34df140/6a319be381e9a44c6244424b_work-vignette-in-cognita-V3.webp',
+    col: '3 / 11',
+    rowOffset: 1,
+    alignSelf: '',
+    imgH: '42.25rem',
+    parallaxY: -100,
+    clipInitial: 'inset(100% 0% 0% 0%)',
+    summary: 'Identity, interactive digital experience, and automated content pipeline for an avant-garde venture lab.',
+    deliverables: ['Brand Identity', 'Interactive Web', 'Workflow Automation'],
+  },
+  {
+    id: 'lgm',
+    title: 'Lgm',
+    subtitle: 'Swiss clarity for complex engineering.',
+    category: 'Enterprise Web & Architecture',
+    year: '2026',
+    image: 'https://cdn.prod.website-files.com/6a2679b9acc91890e34df140/6a319c01066b4f2379f3db78_work-vignette-lgm-V2.webp',
     col: '1 / 5',
     rowOffset: 2,
     alignSelf: 'end',
     imgH: '26.875rem',
     parallaxY: -160,
-    accent: '#D4FF00',
-    palette: ['#10120D', '#1F2614', '#D4FF00'],
-    metrics: ['1.8M docs indexed', '99.2% citation accuracy', '12x research speed'],
-    summary:
-      'Private equity and biotech teams drown in unstructured PDFs and clinical filings. In_Cognita turns raw archives into a living, queryable neural graph with verifiable source citations on every node.',
-    deliverables: [
-      'Hybrid Vector + Graph RAG Pipeline',
-      'Interactive Force-Directed Graph UI',
-      'Automated Daily Deal-Flow Briefings',
-      'Enterprise SSO & Role-Based Vaults'
-    ],
-    livePreviewType: 'graph'
+    clipInitial: 'inset(100% 100% 0% 0%)',
+    summary: 'Architectural grid system, digital platform, and automated technical documentation portal.',
+    deliverables: ['Design System', 'Custom Web App', 'AI Search'],
   },
   {
-    id: 'forma',
-    number: '05',
-    title: 'Forma.Lab',
-    subtitle: 'Parametric 3D hardware configurator in the browser.',
-    category: 'Interactive 3D · E-Commerce & CAD',
+    id: 'haptify',
+    title: 'Haptify',
+    subtitle: 'Engineering the forgotten sense.',
+    category: 'Product Design & Software',
     year: '2026',
+    image: 'https://cdn.prod.website-files.com/6a2679b9acc91890e34df140/6a319bf45a0a1fa70477531a_work-vignette-haptify-V2.webp',
     col: '7 / 13',
     rowOffset: 2,
-    alignSelf: 'start',
+    alignSelf: '',
     imgH: '43.125rem',
     parallaxY: 100,
-    accent: '#FF3B00',
-    palette: ['#161311', '#2B211C', '#FF3B00'],
-    metrics: ['+168% conversion rate', 'Real-time CAD export', '0.4s initial load'],
-    summary:
-      'Architectural lighting and modular acoustic systems configured millimeter-by-millimeter in the browser, generating instant BOM pricing, photometric curves, and factory-ready manufacturing files.',
-    deliverables: [
-      'Parametric WebGL 3D Configurator',
-      'Automated CAD / STEP File Generator',
-      'Headless Shopify Plus & ERP Checkout',
-      'Editorial Product Storytelling'
-    ],
-    livePreviewType: 'parametric'
+    clipInitial: 'inset(100% 0% 0% 100%)',
+    summary: 'Complete brand world, tactile 3D web showcase, and telemetry dashboard for a deep-tech hardware startup.',
+    deliverables: ['3D Web Showcase', 'Telemetry Software', 'Visual Identity'],
   },
-  {
-    id: 'chronos',
-    number: '06',
-    title: 'Chronos_Ops',
-    subtitle: 'Self-healing infrastructure & autonomous incident response.',
-    category: 'AI Agents · DevOps Platform',
-    year: '2026',
-    col: '3 / 11',
-    rowOffset: 3,
-    alignSelf: 'start',
-    imgH: '42.25rem',
-    parallaxY: -90,
-    accent: '#D4FF00',
-    palette: ['#090A0C', '#14191F', '#D4FF00'],
-    metrics: ['-78% MTTR', '24/7 autonomous triage', '400+ integrations'],
-    summary:
-      'When production breaks at 3:00 AM, Chronos correlates logs, traces, and recent commits in seconds, proposes a verified rollback or patch PR, and briefs the on-call engineer on Slack and WhatsApp.',
-    deliverables: [
-      'Autonomous Root-Cause Analysis Agent',
-      'Marketing Flagship & Documentation Hub',
-      'Interactive Incident Replay Timeline',
-      'GitHub, PagerDuty & Cloud Webhooks'
-    ],
-    livePreviewType: 'terminal'
-  }
 ];
 
-export const CAPABILITIES_LIST = [
-  {
-    title: 'High-craft websites & WebGL',
-    tag: '01',
-    accent: '#FF3B00',
-    desc: 'Editorial flagships, custom shaders, GSAP motion systems, and interactive 3D experiences that turn visitors into believers.'
-  },
-  {
-    title: 'Custom software & SaaS',
-    tag: '02',
-    accent: '#D4FF00',
-    desc: 'Full-stack web applications, real-time dashboards, internal tools, and scalable API architectures built for speed.'
-  },
-  {
-    title: 'AI automation & agents',
-    tag: '03',
-    accent: '#FF3B00',
-    desc: 'Autonomous multi-agent workflows, RAG knowledge engines, CRM/ERP pipelines, and custom LLM integrations that eliminate busywork.'
-  },
-  {
-    title: 'Design systems & identity',
-    tag: '04',
-    accent: '#D4FF00',
-    desc: 'Swiss-precision typography, living component libraries, and brand perspectives engineered identically across Figma and code.'
-  },
-  {
-    title: 'Growth & conversion engineering',
-    tag: '05',
-    accent: '#FF3B00',
-    desc: 'Technical SEO, sub-second performance optimization, interactive calculators, and automated lead-qualification funnels.'
-  }
+export const STUDIO_SERVICES = [
+  'Websites & digital experiences',
+  'Custom software & SaaS',
+  'AI agents & automations',
+  'Brand identities & systems',
+  'Growth & conversion engines',
 ];
 
-export const PRICING_CATALOG = [
+export const FAQS = [
   {
-    id: 'web-flagship',
-    name: 'Interactive Web Flagship',
-    type: 'Web Design & Motion',
-    price: '€4,500',
-    timeline: '3 – 5 weeks',
-    accent: '#FF3B00',
-    description:
-      'A custom-designed, high-impact website with signature GSAP motion, fluid interactions, responsive perfection, and technical SEO.',
-    includes: [
-      'Bespoke art direction & Swiss editorial layout',
-      'GSAP ScrollTrigger + Lenis smooth scroll + WebGL accents',
-      'React / Next.js or ultra-fast Vite architecture',
-      'CMS integration, analytics & Lighthouse 95+ tuning'
-    ]
+    q: 'What makes a high-converting website work?',
+    a: 'A flagship website works when every interaction is decided, not decorated. Fewer elements, each one deliberate. The site is not a brochure—it is your point of view held in motion. Design, engineering, and conversion architecture should be built as one piece of work.',
   },
   {
-    id: 'software-mvp',
-    name: 'Custom Software / SaaS Platform',
-    type: 'Full-Stack Engineering',
-    price: '€9,500',
-    timeline: '5 – 8 weeks',
-    accent: '#D4FF00',
-    description:
-      'From blank repository to production-grade web application: architecture, UI/UX design system, backend APIs, auth, and deployment.',
-    includes: [
-      'Complete product UX/UI & interactive component library',
-      'Full-stack engineering (React, Node/Go/Python, Postgres)',
-      'Authentication, billing (Stripe) & role-based permissions',
-      'CI/CD pipeline, cloud deployment & documentation'
-    ]
+    q: 'How long does a website or custom software build take?',
+    a: 'A high-impact website or interactive flagship takes three to five weeks. A custom software product or autonomous AI workflow system takes four to eight weeks. What sets the pace is how fast decisions are made, not how slowly code is written.',
   },
   {
-    id: 'ai-automation',
-    name: 'AI Automation & Agent Systems',
-    type: 'Autonomous Workflows',
-    price: '€3,500',
-    timeline: '2 – 4 weeks',
-    accent: '#FF3B00',
-    description:
-      'Custom AI agents and end-to-end workflow automation wired directly into your existing stack (Slack, WhatsApp, CRM, Email, Databases).',
-    includes: [
-      'Workflow audit & high-ROI automation blueprint',
-      'Custom LLM agents with tool-calling & RAG memory',
-      'Webhook & API bridges (n8n, custom Python/TypeScript, ERP)',
-      'Evaluation guardrails, monitoring & team handover'
-    ]
+    q: 'Design studio, software house, or AI agency?',
+    a: 'Most design studios cannot engineer production software, and most dev shops cannot design a brand people remember. Some.how combines both under one roof: we decide how your brand looks, build the software that powers it, and automate the workflows behind it.',
   },
   {
-    id: 'retainer',
-    name: 'Embedded Studio Partner',
-    type: 'Continuous Design, Code & AI',
-    price: '€3,000 / mo',
-    timeline: 'Monthly · Cancel anytime',
-    accent: '#D4FF00',
-    description:
-      'Your dedicated senior design, full-stack engineering, and AI automation squad shipping continuously without agency overhead.',
-    includes: [
-      'Unlimited prioritized design, web & automation sprints',
-      'Direct Slack / WhatsApp channel with founders',
-      'Continuous AI workflow expansion & feature shipping',
-      'Fixed monthly fee, zero day-rate surprises'
-    ]
-  }
+    q: 'How do we start working together?',
+    a: 'Every engagement is priced by scope as a transparent fixed fee—no hourly surprises. Book a 20-minute discovery call or drop us an email, and within 24 hours we return a clear architectural roadmap and fixed quote.',
+  },
 ];
-
-export const FAQ_ITEMS = [
-  {
-    question: 'What makes a high-craft website convert better than a template?',
-    answer:
-      'A great website works when every interaction is decided, not decorated. Templates make a €10M company look like a weekend project. When typography, motion, and architecture speak with one unmistakable point of view, trust is established in the first three seconds—before a visitor even reads your pricing.',
-    tag: 'Web Design & Craft'
-  },
-  {
-    question: 'How fast can you ship a custom website or software platform?',
-    answer:
-      'An interactive web flagship takes three to five weeks. A full-stack software MVP or custom internal platform takes five to eight weeks. AI automation pipelines often go live in under three weeks. Because we combine senior human direction with our own augmented AI engineering workflows, we spend zero time on boilerplate and 100% of our time on architecture and craft.',
-    tag: 'Timeline & Velocity'
-  },
-  {
-    question: 'What does "AI Automation" actually look like in practice?',
-    answer:
-      'We do not build generic chatbots. We build deterministic systems where AI handles the heavy lifting—triaging inbound leads, extracting structured data from messy documents, syncing ERPs, drafting context-aware responses, or triggering alerts on WhatsApp, Slack, and Email—while keeping critical decisions firmly in human hands.',
-    tag: 'AI Systems'
-  },
-  {
-    question: 'Web studio, software shop, or AI agency—which one is Some.how?',
-    answer:
-      'Splitting brand, web design, software engineering, and AI automation across three different vendors is why most digital products feel disjointed. At Some.how, one senior team designs the interface, writes the production code, and wires the autonomous backend—so the product looks extraordinary and runs effortlessly.',
-    tag: 'Our Model'
-  },
-  {
-    question: 'How much does a project with Some.how cost?',
-    answer:
-      'Every project is priced by scope as a transparent fixed fee—never hourly billing or padded day rates. AI automation systems start at €3,500, interactive web flagships at €4,500, and custom full-stack software platforms at €9,500. You know the exact deliverables, timeline, and investment before day one.',
-    tag: 'Fixed-Fee Pricing'
-  }
-];
-
-export const TEAM_DATA = {
-  leadership: [
-    { name: 'Nikos Kotsifas', role: 'Founder · Creative & Technical Direction' },
-    { name: 'Elena Vance', role: 'Systems Architecture & AI Workflows' },
-    { name: 'Marcus Lindqvist', role: 'Lead Interactive & WebGL Engineer' },
-    { name: 'Clara Moreau', role: 'Swiss Typography & Design Systems' }
-  ],
-  partners: [
-    { name: 'Autonomous Ops Lab', role: 'Multi-Agent Infrastructure' },
-    { name: 'Studio Kinetik', role: '3D Motion & Shader Direction' },
-    { name: 'Hyperion Cloud', role: 'Edge & Distributed Systems' }
-  ]
-};
