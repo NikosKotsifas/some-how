@@ -5,15 +5,12 @@ import { LOADER_3D_OBJECTS } from '../data/studioData';
 // Exact O and H geometry from noth.in's nothin-hero-svg (294px height),
 // paired with matching 66px-stem, 3.5px-fillet geometric paths for S, M, E, ., W.
 const O_PATH_TEMPLATE = (dx) => {
-  // Original O in nothin-hero-svg spans x: 242.965 .. 529.523 (width 286.558)
-  // We shift by (dx - 242.965)
   const s = dx - 242.965;
   const x = (v) => (v + s).toFixed(3);
   return `M${x(330.643)} 11.6645C${x(348.269)} 3.88817 ${x(366.803)} 0 ${x(386.244)} 0C${x(405.685)} 0 ${x(424.218)} 3.88817 ${x(441.845)} 11.6645C${x(459.471)} 19.4408 ${x(474.7)} 29.8741 ${x(487.531)} 42.9643C${x(500.362)} 56.0544 ${x(510.536)} 71.6719 ${x(518.053)} 89.8167C${x(525.7)} 107.832 ${x(529.523)} 126.754 ${x(529.523)} 146.584C${x(529.523)} 166.414 ${x(525.7)} 185.401 ${x(518.053)} 203.546C${x(510.536)} 221.561 ${x(500.362)} 237.113 ${x(487.531)} 250.204C${x(474.7)} 263.294 ${x(459.471)} 273.727 ${x(441.845)} 281.503C${x(424.218)} 289.28 ${x(405.685)} 293.168 ${x(386.244)} 293.168C${x(366.803)} 293.168 ${x(348.269)} 289.28 ${x(330.643)} 281.503C${x(313.017)} 273.727 ${x(297.788)} 263.294 ${x(284.957)} 250.204C${x(272.126)} 237.113 ${x(261.887)} 221.561 ${x(254.241)} 203.546C${x(246.723)} 185.401 ${x(242.965)} 166.414 ${x(242.965)} 146.584C${x(242.965)} 126.754 ${x(246.723)} 107.832 ${x(254.241)} 89.8167C${x(261.887)} 71.6719 ${x(272.126)} 56.0544 ${x(284.957)} 42.9643C${x(297.788)} 29.8741 ${x(313.017)} 19.4408 ${x(330.643)} 11.6645ZM${x(330.837)} 203.157C${x(346.131)} 218.839 ${x(364.6)} 226.68 ${x(386.244)} 226.68C${x(407.888)} 226.68 ${x(426.357)} 218.839 ${x(441.65)} 203.157C${x(456.944)} 187.475 ${x(464.59)} 168.617 ${x(464.59)} 146.584C${x(464.59)} 124.551 ${x(456.944)} 105.693 ${x(441.65)} 90.0111C${x(426.357)} 74.3288 ${x(407.888)} 66.4877 ${x(386.244)} 66.4877C${x(364.6)} 66.4877 ${x(346.131)} 74.3288 ${x(330.837)} 90.0111C${x(315.544)} 105.693 ${x(307.897)} 124.551 ${x(307.897)} 146.584C${x(307.897)} 168.617 ${x(315.544)} 187.475 ${x(330.837)} 203.157Z`;
 };
 
 const H_PATH_TEMPLATE = (dx) => {
-  // Original H in nothin-hero-svg spans x: 727.668 .. 956.292 (width 228.624)
   const s = dx - 727.668;
   const x = (v) => (v + s).toFixed(3);
   return `M${x(952.793)} 7.97076C${x(953.7)} 7.97076 ${x(954.478)} 8.35958 ${x(955.126)} 9.13721C${x(955.904)} 9.78524 ${x(956.292)} 10.5629 ${x(956.292)} 11.4701V283.253C${x(956.292)} 284.16 ${x(955.904)} 285.003 ${x(955.126)} 285.78C${x(954.478)} 286.428 ${x(953.7)} 286.752 ${x(952.793)} 286.752H${x(888.638)}C${x(887.731)} 286.752 ${x(886.888)} 286.428 ${x(886.111)} 285.78C${x(885.463)} 285.003 ${x(885.139)} 284.16 ${x(885.139)} 283.253V180.994C${x(885.139)} 180.087 ${x(884.75)} 179.309 ${x(883.972)} 178.661C${x(883.324)} 177.884 ${x(882.547)} 177.495 ${x(881.639)} 177.495H${x(802.126)}C${x(799.793)} 177.495 ${x(798.627)} 178.597 ${x(798.627)} 180.8V283.253C${x(798.627)} 284.16 ${x(798.303)} 285.003 ${x(797.655)} 285.78C${x(797.007)} 286.428 ${x(796.164)} 286.752 ${x(795.128)} 286.752H${x(731.167)}C${x(730.26)} 286.752 ${x(729.418)} 286.428 ${x(728.64)} 285.78C${x(727.992)} 285.003 ${x(727.668)} 284.16 ${x(727.668)} 283.253V11.4701C${x(727.668)} 10.5629 ${x(727.992)} 9.78524 ${x(728.64)} 9.13721C${x(729.418)} 8.35958 ${x(730.26)} 7.97076 ${x(731.167)} 7.97076H${x(795.128)}C${x(796.164)} 7.97076 ${x(797.007)} 8.35958 ${x(797.655)} 9.13721C${x(798.303)} 9.78524 ${x(798.627)} 10.5629 ${x(798.627)} 11.4701V110.23C${x(798.627)} 112.433 ${x(799.793)} 113.535 ${x(802.126)} 113.535H${x(881.639)}C${x(882.547)} 113.535 ${x(883.324)} 113.211 ${x(883.972)} 112.562C${x(884.75)} 111.914 ${x(885.139)} 111.072 ${x(885.139)} 110.035V11.4701C${x(885.139)} 10.5629 ${x(885.463)} 9.78524 ${x(886.111)} 9.13721C${x(886.888)} 8.35958 ${x(887.731)} 7.97076 ${x(888.638)} 7.97076H${x(952.793)}Z`;
@@ -27,7 +24,6 @@ export const LETTER_DEFS = [
     w: 222,
     cx: 111,
     cy: 147,
-    // Geometric heavy S with 64px stroke weight matching PP Neue Montreal Bold / noth.in
     d: 'M112 0C168 0 212 31 216 86C216.2 88.5 214.5 90 212 90H150C147.5 90 146 88.5 145 86C141 66 128 56 109 56C88 56 74 66 74 81C74 95 86 103 119 111L146 118C194 130 222 156 222 203C222 259 177 293.168 113 293.168C48 293.168 3 258 0 199C-0.2 196.5 1.5 195 4 195H67C69.5 195 71 196.5 72 199C76 223 91 236 114 236C137 236 153 225 153 208C153 192 141 184 108 175L79 168C30 156 5 130 5 85C5 33 49 0 112 0Z',
   },
   {
@@ -96,7 +92,7 @@ export const LETTER_DEFS = [
   },
 ];
 
-// 1. Navbar collapsible logo (matches noth.in's vv() function: SOME.HOW <-> S.HOW on scroll/hover)
+// 1. Navbar collapsible logo (SOME.HOW <-> S.HOW on scroll/hover)
 export function SomeHowNavLogo() {
   const svgRef = useRef(null);
 
@@ -108,13 +104,17 @@ export function SomeHowNavLogo() {
 
     gsap.set(midChars, { transformOrigin: 'left center' });
     const tl = gsap.timeline({ paused: true });
-    tl.to(midChars, {
-      scaleX: 0,
-      opacity: 0,
-      duration: 0.45,
-      stagger: 0.025,
-      ease: 'power3.inOut',
-    }, 0).to(
+    tl.to(
+      midChars,
+      {
+        scaleX: 0,
+        opacity: 0,
+        duration: 0.45,
+        stagger: 0.025,
+        ease: 'power3.inOut',
+      },
+      0
+    ).to(
       tailChars,
       {
         x: -820,
@@ -184,54 +184,292 @@ export function SomeHowNavLogo() {
   );
 }
 
-// 2. Loader left ('S') and right ('.W') SVGs at identical 294-unit cap height
-export function LoaderLeftGlyph() {
+// 2. Monumental 1:1 Opening Loader Logo (viewBox 0 0 2020 294 — exact same size, position, and LETTER_DEFS geometry as the Hero logo underneath)
+export const LOADER_LUXURY_EDITIONS = [
+  {
+    id: 'liquid-mercury',
+    code: '01',
+    title: 'LIQUID MERCURY // PLATINUM CHROME',
+    accent: '#e2e8f0',
+  },
+  {
+    id: 'champagne-gold',
+    code: '02',
+    title: '24K CHAMPAGNE GOLD // BRUSHED TITANIUM',
+    accent: '#f5d08a',
+  },
+  {
+    id: 'obsidian-mylar',
+    code: '03',
+    title: 'OBSIDIAN MYLAR // SPECULAR MONOLITH',
+    accent: '#a1a1aa',
+  },
+  {
+    id: 'smoked-crystal',
+    code: '04',
+    title: 'SMOKED CRYSTAL // DICHROIC PRISM',
+    accent: '#c4b5fd',
+  },
+  {
+    id: 'anodized-cobalt',
+    code: '05',
+    title: 'ANODIZED COBALT // CRYOGENIC SILVER',
+    accent: '#60a5fa',
+  },
+  {
+    id: 'basalt-ember',
+    code: '06',
+    title: 'VOLCANIC BASALT // MOLTEN AMBER',
+    accent: '#fb923c',
+  },
+];
+
+export function SomeHowLoaderMonumentLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="100%"
-      viewBox="0 0 222 294"
+      viewBox="0 0 2020 294"
       fill="none"
-      className="n-load"
+      className="loader-monument-svg"
+      aria-label="SOME.HOW"
     >
-      <path d={LETTER_DEFS[0].d} fill="currentColor" />
+      <defs>
+        {/* Exact 1:1 LETTER_DEFS ClipPath with per-letter kinetic stagger paths */}
+        <clipPath id="loader-somehow-exact-clip">
+          {LETTER_DEFS.map((l) => (
+            <path
+              key={l.id}
+              d={l.d}
+              className={`loader-char-clip ${l.isDot ? 'loader-dot-clip' : ''}`}
+            />
+          ))}
+        </clipPath>
+
+        {/* 01: Liquid Mercury Platinum */}
+        <linearGradient id="lux-grad-mercury" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#090a0f" />
+          <stop offset="22%" stopColor="#cbd5e1" />
+          <stop offset="38%" stopColor="#ffffff" />
+          <stop offset="54%" stopColor="#1e293b" />
+          <stop offset="76%" stopColor="#f8fafc" />
+          <stop offset="100%" stopColor="#0f172a" />
+        </linearGradient>
+
+        {/* 02: 24K Champagne Gold & Brushed Titanium */}
+        <linearGradient id="lux-grad-gold" x1="0%" y1="0%" x2="100%" y2="85%">
+          <stop offset="0%" stopColor="#141418" />
+          <stop offset="24%" stopColor="#85581A" />
+          <stop offset="44%" stopColor="#FDE68A" />
+          <stop offset="58%" stopColor="#FFFBEB" />
+          <stop offset="75%" stopColor="#B47B2B" />
+          <stop offset="100%" stopColor="#18181c" />
+        </linearGradient>
+
+        {/* 03: Obsidian Mylar & Specular Silver */}
+        <linearGradient id="lux-grad-obsidian" x1="0%" y1="10%" x2="100%" y2="90%">
+          <stop offset="0%" stopColor="#050507" />
+          <stop offset="30%" stopColor="#18181b" />
+          <stop offset="48%" stopColor="#f4f4f5" />
+          <stop offset="56%" stopColor="#09090b" />
+          <stop offset="82%" stopColor="#52525b" />
+          <stop offset="100%" stopColor="#050507" />
+        </linearGradient>
+
+        {/* 04: Smoked Crystal & Dichroic Prism */}
+        <linearGradient id="lux-grad-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0f172a" />
+          <stop offset="25%" stopColor="#38bdf8" />
+          <stop offset="48%" stopColor="#f8fafc" />
+          <stop offset="68%" stopColor="#c084fc" />
+          <stop offset="88%" stopColor="#fde68a" />
+          <stop offset="100%" stopColor="#090d16" />
+        </linearGradient>
+
+        {/* 05: Anodized Royal Cobalt & Cryogenic Platinum */}
+        <linearGradient id="lux-grad-cobalt" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#061238" />
+          <stop offset="28%" stopColor="#1d4ed8" />
+          <stop offset="50%" stopColor="#eff6ff" />
+          <stop offset="68%" stopColor="#2563eb" />
+          <stop offset="88%" stopColor="#93c5fd" />
+          <stop offset="100%" stopColor="#040b24" />
+        </linearGradient>
+
+        {/* 06: Volcanic Basalt & Molten Amber */}
+        <linearGradient id="lux-grad-ember" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0c0a09" />
+          <stop offset="28%" stopColor="#7c2d12" />
+          <stop offset="50%" stopColor="#fb923c" />
+          <stop offset="62%" stopColor="#fff7ed" />
+          <stop offset="82%" stopColor="#9a3412" />
+          <stop offset="100%" stopColor="#0c0a09" />
+        </linearGradient>
+
+        {/* Sweeping Studio Softbox Specular Bar */}
+        <linearGradient id="lux-specular-sweep" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+          <stop offset="42%" stopColor="rgba(255,255,255,0.04)" />
+          <stop offset="50%" stopColor="rgba(255,255,255,0.88)" />
+          <stop offset="58%" stopColor="rgba(255,255,255,0.04)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+        </linearGradient>
+      </defs>
+
+      {/* All layers inside this group are 100.00% clipped to the exact LETTER_DEFS silhouette */}
+      <g clipPath="url(#loader-somehow-exact-clip)">
+        {/* Base Crisp White Monumental Layer (matches Hero base layer 1:1) */}
+        <rect x="0" y="0" width="2020" height="294" fill="#ffffff" className="loader-base-white" />
+
+        {/* Edition 01: Liquid Mercury Platinum + Studio Reflection Texture */}
+        <g className="loader-edition-layer" data-edition="0">
+          <rect x="0" y="0" width="2020" height="294" fill="url(#lux-grad-mercury)" />
+          <image
+            href="somehow-assets/hero-09.jpg"
+            x="-60"
+            y="-180"
+            width="2140"
+            height="654"
+            preserveAspectRatio="none"
+            opacity="0.62"
+            style={{ mixBlendMode: 'screen' }}
+          />
+        </g>
+
+        {/* Edition 02: 24K Champagne Gold & Brushed Titanium */}
+        <g className="loader-edition-layer" data-edition="1" style={{ opacity: 0 }}>
+          <rect x="0" y="0" width="2020" height="294" fill="url(#lux-grad-gold)" />
+          <image
+            href="somehow-assets/hero-09.jpg"
+            x="-60"
+            y="-180"
+            width="2140"
+            height="654"
+            preserveAspectRatio="none"
+            opacity="0.48"
+            style={{ mixBlendMode: 'overlay' }}
+          />
+        </g>
+
+        {/* Edition 03: Obsidian Mylar Sculpture */}
+        <g className="loader-edition-layer" data-edition="2" style={{ opacity: 0 }}>
+          <rect x="0" y="0" width="2020" height="294" fill="url(#lux-grad-obsidian)" />
+          <image
+            href="somehow-assets/hero-01.jpg"
+            x="-60"
+            y="-180"
+            width="2140"
+            height="654"
+            preserveAspectRatio="none"
+            opacity="0.78"
+            style={{ mixBlendMode: 'lighten' }}
+          />
+        </g>
+
+        {/* Edition 04: Smoked Crystal & Dichroic Prism */}
+        <g className="loader-edition-layer" data-edition="3" style={{ opacity: 0 }}>
+          <rect x="0" y="0" width="2020" height="294" fill="url(#lux-grad-crystal)" />
+          <image
+            href="somehow-assets/hero-02.jpg"
+            x="-60"
+            y="-180"
+            width="2140"
+            height="654"
+            preserveAspectRatio="none"
+            opacity="0.58"
+            style={{ mixBlendMode: 'screen' }}
+          />
+        </g>
+
+        {/* Edition 05: Anodized Royal Cobalt & Cryogenic Silver */}
+        <g className="loader-edition-layer" data-edition="4" style={{ opacity: 0 }}>
+          <rect x="0" y="0" width="2020" height="294" fill="url(#lux-grad-cobalt)" />
+          <image
+            href="somehow-assets/hero-03.jpg"
+            x="-60"
+            y="-180"
+            width="2140"
+            height="654"
+            preserveAspectRatio="none"
+            opacity="0.68"
+            style={{ mixBlendMode: 'screen' }}
+          />
+        </g>
+
+        {/* Edition 06: Volcanic Basalt & Molten Amber */}
+        <g className="loader-edition-layer" data-edition="5" style={{ opacity: 0 }}>
+          <rect x="0" y="0" width="2020" height="294" fill="url(#lux-grad-ember)" />
+          <image
+            href="somehow-assets/hero-01.jpg"
+            x="-60"
+            y="-180"
+            width="2140"
+            height="654"
+            preserveAspectRatio="none"
+            opacity="0.55"
+            style={{ mixBlendMode: 'screen' }}
+          />
+        </g>
+
+        {/* 3D Inner Architectural Chamfer Bevel along exact LETTER_DEFS edges */}
+        <g className="loader-3d-bevel-strokes" style={{ pointerEvents: 'none' }}>
+          {LETTER_DEFS.map((l) => (
+            <path
+              key={`bevel-outer-${l.id}`}
+              d={l.d}
+              fill="none"
+              stroke="rgba(0, 0, 0, 0.55)"
+              strokeWidth="16"
+              strokeLinejoin="round"
+            />
+          ))}
+          {LETTER_DEFS.map((l) => (
+            <path
+              key={`bevel-spec-${l.id}`}
+              d={l.d}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.72)"
+              strokeWidth="5.5"
+              strokeLinejoin="round"
+            />
+          ))}
+        </g>
+
+        {/* Sweeping Studio Softbox Light Bar */}
+        <rect
+          x="-900"
+          y="0"
+          width="900"
+          height="294"
+          fill="url(#lux-specular-sweep)"
+          className="loader-specular-bar"
+          style={{ mixBlendMode: 'screen' }}
+        />
+      </g>
     </svg>
   );
+}
+
+export function LoaderLeftGlyph() {
+  return <SomeHowLoaderMonumentLogo />;
 }
 
 export function LoaderRightGlyph() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="100%"
-      viewBox="1064 0 956 294"
-      fill="none"
-      className="apos-load"
-    >
-      <path d={LETTER_DEFS[4].d} fill="currentColor" />
-      <path d={LETTER_DEFS[5].d} fill="currentColor" />
-      <path d={LETTER_DEFS[6].d} fill="currentColor" />
-      <path d={LETTER_DEFS[7].d} fill="currentColor" />
-    </svg>
-  );
+  return null;
 }
 
-// 3. Hero Living Wordmark that continuously transforms the SOME.HOW logo
-// with all 12 of noth.in's 3D sculptural & illustrated designs
+// 3. Hero Living Wordmark
 export function SomeHowHeroLogo({ revealed }) {
   const wrapRef = useRef(null);
   const svgRef = useRef(null);
-  // Active 3D sculptural replacements keyed by letter index -> { objIndex, rotation, scale }
   const [activeMorphs, setActiveMorphs] = useState(() => ({
-    1: { objIdx: 0, rot: -12 }, // 'O' starts with bubble-wrap heart
-    4: { objIdx: 2, rot: 14 },  // '.' starts with glossy black asterisk balloon
-    6: { objIdx: 1, rot: -8 },  // second 'O' starts with chrome blue foil
+    1: { objIdx: 0, rot: -12 },
+    4: { objIdx: 2, rot: 14 },
+    6: { objIdx: 1, rot: -8 },
   }));
 
   const objCursorRef = useRef(3);
   const slotHistoryRef = useRef([1, 4, 6]);
 
-  // Staggered hero reveal animation (exact tf() from noth.in)
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
@@ -270,7 +508,6 @@ export function SomeHowHeroLogo({ revealed }) {
     }
   }, [revealed]);
 
-  // Continuous choreographed loop: transforms letters of SOME.HOW with all 12 3D objects
   useEffect(() => {
     if (!revealed) return;
 
@@ -278,7 +515,6 @@ export function SomeHowHeroLogo({ revealed }) {
     const interval = setInterval(() => {
       setActiveMorphs((prev) => {
         const currentSlots = Object.keys(prev).map(Number);
-        // Pick a new letter slot to transform into the next 3D sculpture
         const available = candidateSlots.filter((s) => !currentSlots.includes(s));
         const nextSlot =
           available[Math.floor(Math.random() * available.length)] ??
@@ -288,7 +524,6 @@ export function SomeHowHeroLogo({ revealed }) {
         objCursorRef.current += 1;
 
         const nextHistory = [...slotHistoryRef.current, nextSlot];
-        // Keep 2 or 3 letters simultaneously transformed into 3D sculptures so the wordSOME.HOW remains readable while continuously morphing
         const maxSimultaneous = 3;
         while (nextHistory.length > maxSimultaneous) {
           nextHistory.shift();
@@ -314,13 +549,11 @@ export function SomeHowHeroLogo({ revealed }) {
     return () => clearInterval(interval);
   }, [revealed]);
 
-  // Hovering any letter immediately transforms it into the next 3D sculpture
   const handleLetterEnter = (idx) => {
     const nextObjIdx = objCursorRef.current % LOADER_3D_OBJECTS.length;
     objCursorRef.current += 1;
     setActiveMorphs((prev) => {
       const next = { ...prev };
-      // Keep at most 3 morphed slots
       const keys = Object.keys(next).map(Number);
       if (!keys.includes(idx) && keys.length >= 3) {
         delete next[keys[0]];
@@ -371,7 +604,6 @@ export function SomeHowHeroLogo({ revealed }) {
         })}
       </svg>
 
-      {/* 3D Sculptural & Illustrated Overlay slots continuously transforming the logo */}
       <div className="hero-3d-morph-layer" aria-hidden="true">
         {LETTER_DEFS.map((l, idx) => {
           const morph = activeMorphs[idx];
@@ -405,7 +637,7 @@ export function SomeHowHeroLogo({ revealed }) {
   );
 }
 
-// 4. Footer monumental wordmark with noth.in's exact hx() elastic squish on hover
+// 4. Footer monumental wordmark with elastic squish on hover
 export function SomeHowFooterLogo() {
   const wrapRef = useRef(null);
 

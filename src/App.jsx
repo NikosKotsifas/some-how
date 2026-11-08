@@ -12,8 +12,8 @@ import {
 } from './data/studioData';
 import {
   SomeHowNavLogo,
-  LoaderLeftGlyph,
-  LoaderRightGlyph,
+  SomeHowLoaderMonumentLogo,
+  LOADER_LUXURY_EDITIONS,
   SomeHowFooterLogo,
 } from './components/SomeHowWordmark';
 import FluidHeroCanvas from './components/FluidHeroCanvas';
@@ -504,135 +504,143 @@ export default function App() {
     };
   }, []);
 
-  // 2. Opening Black Loader Animation (exact hM / uM / I_ / cM from noth.in, resilient to StrictMode)
+  // 2. Opening 1:1 Monumental Architectural Loader Animation
+  // Renders the SOME.HOW logo at the exact same size & position (left: 2.5%, width: 95%, top: 61%)
+  // as the Hero logo underneath, cycling through 6 Luxury 3D Studio Editions before seamlessly unlocking the Hero.
   const runLoaderSequence = () => {
     const loader = loaderRef.current;
-    const imgW = loaderImgWRef.current;
+    const editionLabel = loaderImgWRef.current;
     const nbr = loaderNbrRef.current;
-    if (!loader || !imgW || !nbr) return () => {};
+    if (!loader || !nbr) return () => {};
 
-    const nLoad = loader.querySelector('.n-load');
-    const aposLoad = loader.querySelector('.apos-load');
-    const imgs = [...loader.querySelectorAll('.loader-img')];
+    const charClips = [...loader.querySelectorAll('.loader-char-clip')];
+    const editionLayers = [...loader.querySelectorAll('.loader-edition-layer')];
+    const bevelStrokes = loader.querySelector('.loader-3d-bevel-strokes');
+    const specularBar = loader.querySelector('.loader-specular-bar');
+    const telemetryHud = loader.querySelector('.loader-telemetry-hud');
 
-    gsap.killTweensOf([loader, imgW, nbr, nLoad, aposLoad, ...imgs]);
+    gsap.killTweensOf([
+      loader,
+      nbr,
+      editionLabel,
+      bevelStrokes,
+      specularBar,
+      telemetryHud,
+      ...charClips,
+      ...editionLayers,
+    ]);
 
-    gsap.set(loader, { display: 'block', height: '100vh' });
+    gsap.set(loader, { display: 'block', autoAlpha: 1, height: '100vh' });
     gsap.set(nbr, { autoAlpha: 1 });
-    nbr.textContent = '100';
-    imgs.forEach((img) => gsap.set(img, { opacity: 0, scale: 0.8 }));
-    gsap.set(imgW, { width: '1rem' });
-    if (nLoad) gsap.set(nLoad, { yPercent: 100, opacity: 0 });
-    if (aposLoad) gsap.set(aposLoad, { scale: 0, opacity: 1, transformOrigin: 'center center' });
+    nbr.textContent = '000';
+    if (telemetryHud) gsap.set(telemetryHud, { autoAlpha: 1, y: 0 });
+    if (editionLabel) {
+      editionLabel.textContent = `[ ${LOADER_LUXURY_EDITIONS[0].code} // ${LOADER_LUXURY_EDITIONS[0].title} ]`;
+    }
 
-    const totalDurationMs = 2500;
+    charClips.forEach((p) => gsap.set(p, { yPercent: 115 }));
+    editionLayers.forEach((layer, idx) => gsap.set(layer, { opacity: idx === 0 ? 1 : 0 }));
+    if (bevelStrokes) gsap.set(bevelStrokes, { opacity: 0.9 });
+    if (specularBar) gsap.set(specularBar, { attr: { x: -900 } });
+
+    const totalDurationMs = 2350;
     let activeIdx = 0;
     let cycleTimeout = null;
-    let counterObj = { val: 100 };
+    const counterObj = { val: 0 };
 
     const finishLoader = () => {
       if (cycleTimeout) clearTimeout(cycleTimeout);
-      const currentImg = imgs[activeIdx];
-      if (currentImg) {
-        gsap.to(currentImg, { scale: 0, duration: 0.4, ease: 'power4.inOut', delay: 0.1 });
+      gsap.to(editionLayers, { opacity: 0, duration: 0.45, ease: 'power3.inOut' });
+      if (bevelStrokes) gsap.to(bevelStrokes, { opacity: 0, duration: 0.4, ease: 'power2.out' });
+      if (telemetryHud) {
+        gsap.to(telemetryHud, { autoAlpha: 0, y: -12, duration: 0.38, ease: 'power3.inOut' });
       }
-      gsap.to(imgW, {
-        width: '1rem',
-        duration: 0.55,
-        ease: 'power4.inOut',
-        delay: 0.18,
+      gsap.to(loader, {
+        autoAlpha: 0,
+        duration: 0.65,
+        delay: 0.22,
+        ease: 'power3.inOut',
         onComplete: () => {
-          gsap.to(nbr, { autoAlpha: 0, duration: 0.35, ease: 'power4.inOut' });
-          if (nLoad) gsap.to(nLoad, { yPercent: 100, duration: 0.65, ease: 'power4.inOut' });
-          if (aposLoad) gsap.to(aposLoad, { scale: 0, duration: 0.65, ease: 'power4.inOut' });
-          gsap.to(loader, {
-            height: 0,
-            duration: 1.05,
-            ease: 'power4.inOut',
-            onComplete: () => {
-              gsap.set(loader, { display: 'none' });
-            },
-          });
+          gsap.set(loader, { display: 'none' });
         },
       });
     };
 
-    const stepImages = (startTime) => {
+    const stepEditions = (startTime) => {
       const elapsed = performance.now() - startTime;
       if (elapsed >= totalDurationMs) {
         finishLoader();
         return;
       }
-      const progress = Math.min(elapsed / totalDurationMs, 1);
-      const delayMs = 95 + (280 - 95) * (1 - Math.sin(progress * Math.PI));
-
+      const stepDelay = 340;
       cycleTimeout = setTimeout(() => {
-        const prevImg = imgs[activeIdx];
-        if (prevImg) {
-          gsap.killTweensOf(prevImg);
-          gsap.set(prevImg, { opacity: 0 });
+        const prevLayer = editionLayers[activeIdx];
+        activeIdx = (activeIdx + 1) % editionLayers.length;
+        const nextLayer = editionLayers[activeIdx];
+        const edMeta = LOADER_LUXURY_EDITIONS[activeIdx % LOADER_LUXURY_EDITIONS.length];
+
+        if (editionLabel && edMeta) {
+          editionLabel.textContent = `[ ${edMeta.code} // ${edMeta.title} ]`;
         }
-        activeIdx = (activeIdx + 1) % imgs.length;
-        const nextImg = imgs[activeIdx];
-        if (nextImg) {
-          gsap.killTweensOf(nextImg);
+        if (prevLayer) {
+          gsap.to(prevLayer, { opacity: 0, duration: 0.24, ease: 'power2.inOut', overwrite: 'auto' });
+        }
+        if (nextLayer) {
+          gsap.to(nextLayer, { opacity: 1, duration: 0.24, ease: 'power2.inOut', overwrite: 'auto' });
+        }
+        if (specularBar) {
           gsap.fromTo(
-            nextImg,
-            { opacity: 0, scale: 0.78, rotate: (Math.random() - 0.5) * 24 },
-            {
-              opacity: 1,
-              scale: 1,
-              rotate: (Math.random() - 0.5) * 12,
-              duration: 0.24,
-              ease: 'back.out(1.3)',
-            }
+            specularBar,
+            { attr: { x: -900 } },
+            { attr: { x: 2200 }, duration: 0.34, ease: 'power2.out', overwrite: 'auto' }
           );
         }
-        stepImages(startTime);
-      }, delayMs);
+        stepEditions(startTime);
+      }, stepDelay);
     };
 
-    gsap.to(nLoad, {
-      opacity: 1,
+    gsap.to(charClips, {
       yPercent: 0,
-      duration: 0.6,
-      ease: 'power4.inOut',
+      duration: 0.68,
+      stagger: 0.045,
+      ease: 'power4.out',
+    });
+
+    if (specularBar) {
+      gsap.fromTo(
+        specularBar,
+        { attr: { x: -900 } },
+        { attr: { x: 2200 }, duration: 0.75, ease: 'power2.inOut', delay: 0.1 }
+      );
+    }
+
+    gsap.to(counterObj, {
+      val: 100,
+      duration: totalDurationMs / 1000,
+      ease: 'power2.inOut',
+      onUpdate: () => {
+        if (nbr) nbr.textContent = String(Math.round(counterObj.val)).padStart(3, '0');
+      },
       onComplete: () => {
-        const targetW = window.matchMedia('(max-width: 991px)').matches ? '10rem' : '20rem';
-        gsap.fromTo(imgW, { width: '1rem' }, { width: targetW, duration: 0.75, ease: 'power4.inOut' });
-        if (imgs[0]) {
-          gsap.set(imgs[0], { opacity: 1, scale: 0 });
-          gsap.to(imgs[0], {
-            scale: 1,
-            rotate: 15,
-            duration: 0.48,
-            ease: 'back.out(0.9)',
-            delay: 0.2,
-            onComplete: () => {
-              gsap.to(counterObj, {
-                val: 0,
-                duration: totalDurationMs / 1000,
-                ease: 'power2.inOut',
-                onUpdate: () => {
-                  if (nbr) nbr.textContent = String(Math.round(counterObj.val)).padStart(3, '0');
-                },
-                onComplete: () => {
-                  if (nbr) nbr.textContent = '000';
-                },
-              });
-              stepImages(performance.now());
-            },
-          });
-        }
+        if (nbr) nbr.textContent = '100';
       },
     });
-    if (aposLoad) {
-      gsap.to(aposLoad, { scale: 1, duration: 0.6, ease: 'power4.inOut' });
-    }
+
+    stepEditions(performance.now());
 
     return () => {
       if (cycleTimeout) clearTimeout(cycleTimeout);
-      gsap.killTweensOf([loader, imgW, nbr, nLoad, aposLoad, counterObj, ...imgs]);
+      gsap.killTweensOf([
+        loader,
+        nbr,
+        editionLabel,
+        bevelStrokes,
+        specularBar,
+        telemetryHud,
+        counterObj,
+        ...charClips,
+        ...editionLayers,
+      ]);
     };
   };
 
@@ -1139,16 +1147,16 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Black Opening Loader with 100% original SOME.HOW 3D sculptural objects (click to skip) */}
+      {/* 1:1 Monumental Architectural Loader — exact same size & coordinates as the Hero logo underneath */}
       <div
         ref={loaderRef}
         className="loader"
         onClick={() => {
           if (loaderRef.current) {
             gsap.to(loaderRef.current, {
-              height: 0,
-              duration: 0.55,
-              ease: 'power4.inOut',
+              autoAlpha: 0,
+              duration: 0.45,
+              ease: 'power3.inOut',
               onComplete: () => gsap.set(loaderRef.current, { display: 'none' }),
             });
           }
@@ -1156,28 +1164,19 @@ export default function App() {
         title="Click anywhere to skip intro"
       >
         <div className="loader-c">
-          <div className="fake-top-loader">
-            <div>SOME.HOW</div>
+          <div className="loader-telemetry-hud">
+            <span className="loader-telemetry-tag">SOME.HOW // ARCHITECTURAL &amp; AI STUDIO</span>
+            <span ref={loaderImgWRef} className="loader-telemetry-edition">
+              [ 01 // LIQUID MERCURY // PLATINUM CHROME ]
+            </span>
+            <span className="loader-telemetry-counter">
+              SYS.INIT // <strong ref={loaderNbrRef}>000</strong>%
+            </span>
           </div>
-          <div className="loader-anim">
-            <div className="loader-glyph-clip">
-              <LoaderLeftGlyph />
-            </div>
-            <div ref={loaderImgWRef} className="loader-img-w">
-              {LOADER_3D_OBJECTS.map((obj) => (
-                <CutoutSculptureImg
-                  key={obj.id}
-                  src={obj.src}
-                  grade={obj.grade}
-                  alt={obj.alt}
-                  className={`loader-img ${obj.cls}`}
-                />
-              ))}
-            </div>
-            <LoaderRightGlyph />
-          </div>
-          <div className="loader-nbr-w">
-            <div ref={loaderNbrRef}>100</div>
+
+          {/* Monumental SOME.HOW Wordmark at exact 1:1 Hero position (left: 2.5%, width: 95%, top: 61%) */}
+          <div className="loader-monument-logo-w">
+            <SomeHowLoaderMonumentLogo />
           </div>
         </div>
       </div>
