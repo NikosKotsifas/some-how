@@ -1,5 +1,11 @@
 node_modules/
 dist/
+showcase/
+.github/
 .env
 .env.*
+!.env.example
+.vercel/
+*.pem
+*.key
 .DS_Store
