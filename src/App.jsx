@@ -14,6 +14,7 @@ import {
   SomeHowNavLogo,
   LoaderLeftGlyph,
   LoaderRightGlyph,
+  SomeHowHeroStaticSvg,
   SomeHowFooterLogo,
 } from './components/SomeHowWordmark';
 import FluidHeroCanvas from './components/FluidHeroCanvas';
@@ -1252,8 +1253,18 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Exact Navier-Stokes Fluid Cursor Mask revealing 1:1 3D Luxury SOME.HOW Editions */}
+              {/* Exact noth.in Two-Layer Hero Architecture:
+                  Layer 0 (z-index: 0): .video-hero-bg — 60fps continuously developing 3D luxury SOME.HOW logos
+                  Layer 1 (z-index: 1): .mask-reveal-canvas — opaque static white SOME.HOW logo layer that becomes transparent ONLY along the cursor fluid wake */}
               <FluidHeroCanvas />
+
+              <section className="section hero-home">
+                <div className="container hero-home">
+                  <div className="nothin-hero-w">
+                    <SomeHowHeroStaticSvg />
+                  </div>
+                </div>
+              </section>
             </section>
 
             {/* 2. SHOWREEL SECTION (100% original SOME.HOW 60fps Showreel Canvas) */}

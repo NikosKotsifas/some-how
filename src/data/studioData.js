@@ -1,72 +1,42 @@
 // Curated Luxury 3D Typographic Renders of SOME.HOW:
-// Pink Glossy Couture Fur, Silver Aluminum Foil, Glossy Yellow Bubbles, Disco Mirrorball,
-// Inflating Chrome Silver Balloon, 24K Gold Balloon, Molten Chrome, Obsidian Mylar, Bubble-Wrap.
+// Glossy Pink Couture Fur, Crinkled Silver Aluminum Foil, Glossy Yellow Bubbles,
+// Luxury Disco Mirrorball, Inflating Chrome Silver Balloon, 24K Champagne Gold Balloon.
 export const HERO_3D_LOGOS = [
   {
     id: 'pink-fur',
     src: 'somehow-assets/hero-pink-fur.jpg',
     label: 'Glossy Pink Couture Fur',
-    inflatePulse: 0.012,
+    inflatePulse: 0.022,
   },
   {
     id: 'silver-foil',
     src: 'somehow-assets/hero-silver-foil.jpg',
     label: 'Crinkled Silver Aluminum Foil',
-    inflatePulse: 0.008,
+    inflatePulse: 0.016,
   },
   {
     id: 'yellow-bubbles',
     src: 'somehow-assets/hero-yellow-bubbles.jpg',
     label: 'Glossy Golden-Yellow Bubbles',
-    inflatePulse: 0.018,
+    inflatePulse: 0.028,
   },
   {
     id: 'disco-mirror',
     src: 'somehow-assets/hero-disco-mirror.jpg',
     label: 'Luxury Disco Mirrorball Tiles',
-    inflatePulse: 0.006,
+    inflatePulse: 0.014,
   },
   {
     id: 'silver-balloon',
     src: 'somehow-assets/hero-silver-balloon.jpg',
     label: 'Inflating Chrome Silver Balloon',
-    inflatePulse: 0.032,
+    inflatePulse: 0.042,
   },
   {
     id: 'gold-lux',
     src: 'somehow-assets/hero-gold-lux.jpg',
     label: '24K Champagne Gold Balloon',
-    inflatePulse: 0.024,
-  },
-  {
-    id: 'liquid-mercury',
-    src: 'somehow-assets/hero-09.jpg',
-    label: 'Liquid Platinum Chrome',
-    inflatePulse: 0.015,
-  },
-  {
-    id: 'obsidian-mylar',
-    src: 'somehow-assets/hero-01.jpg',
-    label: 'Obsidian Black Mylar Balloon',
-    inflatePulse: 0.022,
-  },
-  {
-    id: 'crystal-bubbles',
-    src: 'somehow-assets/hero-02.jpg',
-    label: 'Translucent Bubble Cushion',
-    inflatePulse: 0.016,
-  },
-  {
-    id: 'cobalt-foil',
-    src: 'somehow-assets/hero-03.jpg',
-    label: 'Anodized Cobalt & Chrome Foil',
-    inflatePulse: 0.01,
-  },
-  {
-    id: 'magenta-mylar',
-    src: 'somehow-assets/hero-11.jpg',
-    label: 'Glossy Magenta Mylar Vacuum',
-    inflatePulse: 0.018,
+    inflatePulse: 0.032,
   },
 ];
 
