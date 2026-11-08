@@ -1922,7 +1922,7 @@ export default function App() {
                           </div>
                         </div>
                       </a>
-                      <a href="mailto:hello@some.how" className="btn email">
+                      <a href="mailto:hello@somehow.agency" className="btn email">
                         <div className="btn__text">
                           <p className="btn__text-p">send us a brief</p>
                         </div>
