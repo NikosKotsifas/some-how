@@ -14,8 +14,6 @@ export function computeHeroLogoTransform(w, h) {
 }
 
 // Detects the tight typographic bounding box [x, y, w, h] of the "SOME.HOW" letters inside a 16:9 3D render
-// on a #000000 background, ignoring isolated stray sparkles or tiny balloon nozzles so the main cap-height
-// and width of SOME.HOW align 1:1 with the classic white base logo.
 function detectTypographyBBox(img) {
   const aw = 512;
   const ah = 288;
@@ -48,7 +46,6 @@ function detectTypographyBBox(img) {
   let maxCol = 0;
   for (let x = 0; x < aw; x++) if (colCounts[x] > maxCol) maxCol = colCounts[x];
 
-  // Use 18% of peak row density to lock strictly onto the main cap-line and baseline of SOME.HOW
   const rowThresh = Math.max(8, maxRow * 0.18);
   const colThresh = Math.max(5, maxCol * 0.14);
 
@@ -236,9 +233,9 @@ const COMPOSITE_FRAG = `
     vec2 pointerFlipped = vec2(uPointer.x, 1.0 - uPointer.y);
     vec2 toCursor = flippedUv - pointerFlipped;
     float distSq = dot(toCursor, toCursor);
-    float swell = exp(-distSq * 28.0) * uInflatePulse * (0.65 + 0.35 * sin(uTime * 7.5));
+    float swell = exp(-distSq * 24.0) * uInflatePulse * (0.65 + 0.35 * sin(uTime * 8.0));
     vec2 vel = texture2D(uVelocity, vUv).xy;
-    vec2 inflatedUv = clamp(flippedUv - toCursor * swell - vel * 0.00035 * mask, 0.0, 1.0);
+    vec2 inflatedUv = clamp(flippedUv - toCursor * swell - vel * 0.00025 * mask, 0.0, 1.0);
 
     vec4 revealColor = texture2D(uRevealTexture, inflatedUv);
     gl_FragColor = mix(baseColor, revealColor, mask);
@@ -246,19 +243,19 @@ const COMPOSITE_FRAG = `
 `;
 
 // Focused, localized fluid cursor brush ("με μικρότερο εύρος εφέ εμφάνισης του animated logo"):
-// Roughly half the radius of the old full-screen blob so only the letters under the cursor path reveal!
+// Reveals a clean ~180px lens along the cursor path while keeping the rest of the white base logo untouched.
 const SIM_SETTINGS = {
   simResolution: 256,
   dyeResolution: 512,
-  velocityDissipation: 0.945,
-  dyeDissipation: 0.976,
+  velocityDissipation: 0.955,
+  dyeDissipation: 0.981,
   pressureIterations: 18,
-  curlStrength: 14.0,
-  splatRadius: 0.000175,
-  splatForce: 4600,
-  revealSize: 3.1,
-  edgeSoftness: 0.28,
-  edgeWidth: 0.15,
+  curlStrength: 15.0,
+  splatRadius: 0.00024,
+  splatForce: 5200,
+  revealSize: 3.5,
+  edgeSoftness: 0.24,
+  edgeWidth: 0.14,
 };
 
 export default function FluidHeroCanvas() {
@@ -333,6 +330,7 @@ export default function FluidHeroCanvas() {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
     const createFBO = (w, h, filter = gl.LINEAR) => {
+      gl.activeTexture(gl.TEXTURE0);
       const tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
@@ -397,6 +395,7 @@ export default function FluidHeroCanvas() {
     const revealCtx = revealCanvas.getContext('2d');
 
     const createImageTex = () => {
+      gl.activeTexture(gl.TEXTURE0);
       const tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -410,7 +409,13 @@ export default function FluidHeroCanvas() {
     const revealTextures = HERO_3D_LOGOS.map(() => createImageTex());
     const loadedEntries = new Array(HERO_3D_LOGOS.length).fill(null);
 
-    const drawGridLines = (ctx, w, h) => {
+    const drawArchitecturalBackground = (ctx, w, h) => {
+      const grad = ctx.createRadialGradient(w * 0.5, h * 0.25, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
+      grad.addColorStop(0, '#141419');
+      grad.addColorStop(1, '#09090c');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.055)';
       ctx.lineWidth = 1;
       for (let i = 1; i < 12; i++) {
@@ -433,14 +438,7 @@ export default function FluidHeroCanvas() {
     const renderBaseLayerToCanvas = (w, h) => {
       baseCanvas.width = w;
       baseCanvas.height = h;
-
-      const grad = baseCtx.createRadialGradient(w * 0.5, h * 0.25, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
-      grad.addColorStop(0, '#141419');
-      grad.addColorStop(1, '#09090c');
-      baseCtx.fillStyle = grad;
-      baseCtx.fillRect(0, 0, w, h);
-
-      drawGridLines(baseCtx, w, h);
+      drawArchitecturalBackground(baseCtx, w, h);
 
       const { padX, scale, offsetY } = computeHeroLogoTransform(w, h);
 
@@ -454,11 +452,16 @@ export default function FluidHeroCanvas() {
       });
       baseCtx.restore();
 
+      gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, baseTex);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, baseCanvas);
     };
 
-    // 2. Render 3D Typographic Image into its WebGL Texture aligned 1:1 with the Classic White Base Logo
+    // 2. Render 3D Luxury Typographic Image into its WebGL Texture locked 1:1 to the Classic White Base Logo:
+    // - Maps [bbox.x, bbox.y, bbox.w, bbox.h] of the 3D render onto [targetX, targetY, targetW, targetH]
+    // - Clips strictly to LETTER_DEFS so the outer size & kerning match the white base logo 100.0%
+    // - Uses 'lighten' multi-offset texture dilation inside the clip so #000000 gaps from the JPEG
+    //   NEVER punch black holes into the white letters, filling 100% of every letter with the 3D material!
     const renderSingleRevealTexture = (idx, w, h) => {
       const entry = loadedEntries[idx];
       if (!entry || !entry.img) return;
@@ -466,14 +469,15 @@ export default function FluidHeroCanvas() {
 
       revealCanvas.width = w;
       revealCanvas.height = h;
+      drawArchitecturalBackground(revealCtx, w, h);
 
-      revealCtx.fillStyle = '#09090c';
-      revealCtx.fillRect(0, 0, w, h);
+      const { padX: targetX, availW: targetW, scale, drawnH: targetH, offsetY: targetY } = computeHeroLogoTransform(w, h);
 
-      // Exact target rectangle of the classic white SOME.HOW base logo:
-      const { padX: targetX, availW: targetW, drawnH: targetH, offsetY: targetY } = computeHeroLogoTransform(w, h);
+      const combinedPath = new Path2D();
+      LETTER_DEFS.forEach((l) => {
+        combinedPath.addPath(new Path2D(l.d));
+      });
 
-      // Map the 3D typography's core [bbox.x, bbox.y, bbox.w, bbox.h] 1:1 onto [targetX, targetY, targetW, targetH]
       const scaleX = targetW / bbox.w;
       const scaleY = targetH / bbox.h;
       const drawX = targetX - bbox.x * scaleX;
@@ -481,14 +485,63 @@ export default function FluidHeroCanvas() {
       const drawW = (img.naturalWidth || img.width) * scaleX;
       const drawH = (img.naturalHeight || img.height) * scaleY;
 
-      revealCtx.drawImage(img, drawX, drawY, drawW, drawH);
-      drawGridLines(revealCtx, w, h);
+      // Clip to the exact 1:1 LETTER_DEFS geometry of the classic white base logo
+      revealCtx.save();
+      revealCtx.translate(targetX, targetY);
+      revealCtx.scale(scale, scale);
+      revealCtx.clip(combinedPath);
+      revealCtx.setTransform(1, 0, 0, 1, 0, 0);
 
+      // Dark base inside the letters before 'lighten' multi-pass texture fill
+      revealCtx.fillStyle = '#08080b';
+      revealCtx.fillRect(targetX, targetY, targetW, targetH);
+
+      // Multi-offset 'lighten' passes ensure 100% of the LETTER_DEFS stems are filled with the 3D texture
+      // (pink fur, silver foil, yellow bubbles, disco tiles, inflating silver balloon) with ZERO black holes!
+      revealCtx.globalCompositeOperation = 'lighten';
+      const stepX = Math.round(28 * scale);
+      const stepY = Math.round(18 * scale);
+      const offsets = [
+        [-stepX * 2, 0],
+        [stepX * 2, 0],
+        [-stepX, -stepY],
+        [stepX, -stepY],
+        [-stepX, stepY],
+        [stepX, stepY],
+        [-stepX, 0],
+        [stepX, 0],
+        [0, -stepY],
+        [0, stepY],
+        [0, 0],
+      ];
+      for (const [ox, oy] of offsets) {
+        revealCtx.drawImage(img, drawX + ox, drawY + oy, drawW, drawH);
+      }
+
+      // Add subtle 3D studio pillow contour along the exact LETTER_DEFS boundary so each letter
+      // has organic 3D rounded depth & specular rim lighting inside its 1:1 silhouette
+      revealCtx.translate(targetX, targetY);
+      revealCtx.scale(scale, scale);
+      revealCtx.lineJoin = 'round';
+      revealCtx.lineCap = 'round';
+
+      revealCtx.globalCompositeOperation = 'multiply';
+      revealCtx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
+      revealCtx.lineWidth = 20;
+      revealCtx.stroke(combinedPath);
+
+      revealCtx.globalCompositeOperation = 'screen';
+      revealCtx.strokeStyle = 'rgba(255, 255, 255, 0.32)';
+      revealCtx.lineWidth = 7;
+      revealCtx.stroke(combinedPath);
+
+      revealCtx.restore();
+
+      gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, revealTextures[idx]);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, revealCanvas);
     };
 
-    // Always initialize dimensions and upload baseTex on mount (resilient to React 18 StrictMode remounts!)
     const syncSize = (force = false) => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = Math.max(1, Math.floor(window.innerWidth * dpr));
@@ -507,7 +560,7 @@ export default function FluidHeroCanvas() {
     const onResize = () => syncSize(false);
     window.addEventListener('resize', onResize);
 
-    // Preload all 11 luxury 3D typographic renders & compute their exact 1:1 typography bounding boxes
+    // Preload all 11 luxury 3D typographic renders & compute their 1:1 typography bounding boxes
     HERO_3D_LOGOS.forEach((item, idx) => {
       const img = new Image();
       img.decoding = 'async';
@@ -577,8 +630,8 @@ export default function FluidHeroCanvas() {
       const dt = Math.min((now - lastTime) / 1000, 0.033);
       lastTime = now;
 
-      // Rapidly cycle through the 11 luxury 3D typographic renders (155ms per frame)
-      if (now - lastCycleTime > 155) {
+      // Rapidly cycle through the 11 luxury 3D typographic renders (145ms per frame)
+      if (now - lastCycleTime > 145) {
         let next = (activeIdx + 1) % HERO_3D_LOGOS.length;
         for (let tries = 0; tries < HERO_3D_LOGOS.length; tries++) {
           const candidate = (activeIdx + 1 + tries) % HERO_3D_LOGOS.length;
