@@ -49,7 +49,6 @@ function detectTypographyBBox(img) {
   for (let x = 0; x < aw; x++) if (colCounts[x] > maxCol) maxCol = colCounts[x];
 
   // Use 18% of peak row density to lock strictly onto the main cap-line and baseline of SOME.HOW
-  // (ignoring tiny balloon nozzles at the very bottom or thin starlight rays above)
   const rowThresh = Math.max(8, maxRow * 0.18);
   const colThresh = Math.max(5, maxCol * 0.14);
 
@@ -209,7 +208,7 @@ const ADVECTION_FRAG = `
 
 // Composite fragment shader:
 // - Shows the 100% pure classic white SOME.HOW base logo (uBaseTexture) everywhere by default.
-// - ONLY inside the tight cursor fluid brush (mask), reveals the 1:1 size-matched 3D luxury typography
+// - ONLY inside the localized cursor fluid brush (mask), reveals the 1:1 size-matched 3D luxury typography
 //   (uRevealTexture) with a subtle 3D inflation/breathing pulse around the cursor wake.
 const COMPOSITE_FRAG = `
   precision highp float;
@@ -237,28 +236,29 @@ const COMPOSITE_FRAG = `
     vec2 pointerFlipped = vec2(uPointer.x, 1.0 - uPointer.y);
     vec2 toCursor = flippedUv - pointerFlipped;
     float distSq = dot(toCursor, toCursor);
-    float swell = exp(-distSq * 38.0) * uInflatePulse * (0.65 + 0.35 * sin(uTime * 7.0));
+    float swell = exp(-distSq * 28.0) * uInflatePulse * (0.65 + 0.35 * sin(uTime * 7.5));
     vec2 vel = texture2D(uVelocity, vUv).xy;
-    vec2 inflatedUv = clamp(flippedUv - toCursor * swell - vel * 0.00045 * mask, 0.0, 1.0);
+    vec2 inflatedUv = clamp(flippedUv - toCursor * swell - vel * 0.00035 * mask, 0.0, 1.0);
 
     vec4 revealColor = texture2D(uRevealTexture, inflatedUv);
     gl_FragColor = mix(baseColor, revealColor, mask);
   }
 `;
 
-// Tight, localized fluid cursor brush settings ("με μικρότερο εύρος εφέ εμφάνισης του animated logo")
+// Focused, localized fluid cursor brush ("με μικρότερο εύρος εφέ εμφάνισης του animated logo"):
+// Roughly half the radius of the old full-screen blob so only the letters under the cursor path reveal!
 const SIM_SETTINGS = {
   simResolution: 256,
   dyeResolution: 512,
-  velocityDissipation: 0.91,
-  dyeDissipation: 0.952,
+  velocityDissipation: 0.945,
+  dyeDissipation: 0.976,
   pressureIterations: 18,
-  curlStrength: 12.0,
-  splatRadius: 0.000068,
-  splatForce: 2350,
-  revealSize: 1.55,
-  edgeSoftness: 0.42,
-  edgeWidth: 0.16,
+  curlStrength: 14.0,
+  splatRadius: 0.000175,
+  splatForce: 4600,
+  revealSize: 3.1,
+  edgeSoftness: 0.28,
+  edgeWidth: 0.15,
 };
 
 export default function FluidHeroCanvas() {
@@ -410,13 +410,7 @@ export default function FluidHeroCanvas() {
     const revealTextures = HERO_3D_LOGOS.map(() => createImageTex());
     const loadedEntries = new Array(HERO_3D_LOGOS.length).fill(null);
 
-    const drawArchitecturalGrid = (ctx, w, h) => {
-      const grad = ctx.createRadialGradient(w * 0.5, h * 0.25, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
-      grad.addColorStop(0, '#141419');
-      grad.addColorStop(1, '#09090c');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
+    const drawGridLines = (ctx, w, h) => {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.055)';
       ctx.lineWidth = 1;
       for (let i = 1; i < 12; i++) {
@@ -439,7 +433,14 @@ export default function FluidHeroCanvas() {
     const renderBaseLayerToCanvas = (w, h) => {
       baseCanvas.width = w;
       baseCanvas.height = h;
-      drawArchitecturalGrid(baseCtx, w, h);
+
+      const grad = baseCtx.createRadialGradient(w * 0.5, h * 0.25, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
+      grad.addColorStop(0, '#141419');
+      grad.addColorStop(1, '#09090c');
+      baseCtx.fillStyle = grad;
+      baseCtx.fillRect(0, 0, w, h);
+
+      drawGridLines(baseCtx, w, h);
 
       const { padX, scale, offsetY } = computeHeroLogoTransform(w, h);
 
@@ -465,7 +466,9 @@ export default function FluidHeroCanvas() {
 
       revealCanvas.width = w;
       revealCanvas.height = h;
-      drawArchitecturalGrid(revealCtx, w, h);
+
+      revealCtx.fillStyle = '#09090c';
+      revealCtx.fillRect(0, 0, w, h);
 
       // Exact target rectangle of the classic white SOME.HOW base logo:
       const { padX: targetX, availW: targetW, drawnH: targetH, offsetY: targetY } = computeHeroLogoTransform(w, h);
@@ -478,28 +481,19 @@ export default function FluidHeroCanvas() {
       const drawW = (img.naturalWidth || img.width) * scaleX;
       const drawH = (img.naturalHeight || img.height) * scaleY;
 
-      revealCtx.save();
-      // Use 'screen' or direct draw over dark architectural canvas so #000000 background blends seamlessly
-      revealCtx.globalCompositeOperation = 'screen';
       revealCtx.drawImage(img, drawX, drawY, drawW, drawH);
-      revealCtx.restore();
-
-      // For dark-toned mylar (like obsidian-mylar), also reinforce interior opacity above threshold
-      if (HERO_3D_LOGOS[idx]?.id === 'obsidian-mylar') {
-        revealCtx.save();
-        revealCtx.drawImage(img, drawX, drawY, drawW, drawH);
-        revealCtx.restore();
-      }
+      drawGridLines(revealCtx, w, h);
 
       gl.bindTexture(gl.TEXTURE_2D, revealTextures[idx]);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, revealCanvas);
     };
 
-    const syncSize = () => {
+    // Always initialize dimensions and upload baseTex on mount (resilient to React 18 StrictMode remounts!)
+    const syncSize = (force = false) => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = Math.max(1, Math.floor(window.innerWidth * dpr));
       const h = Math.max(1, Math.floor(window.innerHeight * dpr));
-      if (canvas.width !== w || canvas.height !== h) {
+      if (force || canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
         renderBaseLayerToCanvas(w, h);
@@ -509,8 +503,9 @@ export default function FluidHeroCanvas() {
       }
     };
 
-    syncSize();
-    window.addEventListener('resize', syncSize);
+    syncSize(true);
+    const onResize = () => syncSize(false);
+    window.addEventListener('resize', onResize);
 
     // Preload all 11 luxury 3D typographic renders & compute their exact 1:1 typography bounding boxes
     HERO_3D_LOGOS.forEach((item, idx) => {
@@ -538,10 +533,8 @@ export default function FluidHeroCanvas() {
       blit(velocity.write);
       velocity.swap();
 
-      const speed = Math.min(Math.hypot(dx, dy) / 2600, 1.0);
-      const intensity = 0.55 + speed * 0.45;
       gl.uniform1i(splatProg.uniforms.uTarget, 0);
-      gl.uniform3f(splatProg.uniforms.uColor, intensity, intensity, intensity);
+      gl.uniform3f(splatProg.uniforms.uColor, 0.95, 0.95, 0.95);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, dye.read.tex);
       blit(dye.write);
@@ -568,7 +561,7 @@ export default function FluidHeroCanvas() {
       pointer.x = nx;
       pointer.y = ny;
 
-      if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
+      if (Math.abs(dx) > 0.005 || Math.abs(dy) > 0.005) {
         splat(nx, ny, dx, dy);
       }
     };
@@ -682,7 +675,7 @@ export default function FluidHeroCanvas() {
       blit(dye.write);
       dye.swap();
 
-      // 8. Final Composite: Classic White Base Logo + Tight Cursor Fluid Reveal of 1:1 3D Typography
+      // 8. Final Composite: Classic White Base Logo + Localized Cursor Fluid Reveal of 1:1 3D Typography
       gl.useProgram(compositeProg.prog);
       gl.uniform1i(compositeProg.uniforms.uBaseTexture, 0);
       gl.uniform1i(compositeProg.uniforms.uRevealTexture, 1);
@@ -719,7 +712,7 @@ export default function FluidHeroCanvas() {
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', syncSize);
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onPointerMove);
     };
   }, []);
