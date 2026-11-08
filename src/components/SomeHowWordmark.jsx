@@ -184,7 +184,7 @@ export function SomeHowNavLogo() {
   );
 }
 
-// 2. Loader left ('S') and right ('.H' / apostrophe) SVGs matching .n-load and .apos-load
+// 2. Loader left ('S') and right ('.W') SVGs at identical 294-unit cap height
 export function LoaderLeftGlyph() {
   return (
     <svg
@@ -204,14 +204,14 @@ export function LoaderRightGlyph() {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="100%"
-      viewBox="0 0 41 50"
+      viewBox="1064 0 956 294"
       fill="none"
       className="apos-load"
     >
-      <path
-        d="M39.5359 0C39.9821 0 40.3447 0.195095 40.6235 0.585285C40.9582 0.975474 41.0697 1.39353 40.9582 1.83947L20.9631 48.9967C20.7958 49.6656 20.3217 50 19.5409 50H1.47004C1.02385 50 0.633448 49.8328 0.298802 49.4983C0.0199315 49.1081 -0.0637449 48.6901 0.0478035 48.2441L11.3421 1.17057C11.5652 0.39019 12.0393 0 12.7643 0H39.5359Z"
-        fill="currentColor"
-      />
+      <path d={LETTER_DEFS[4].d} fill="currentColor" />
+      <path d={LETTER_DEFS[5].d} fill="currentColor" />
+      <path d={LETTER_DEFS[6].d} fill="currentColor" />
+      <path d={LETTER_DEFS[7].d} fill="currentColor" />
     </svg>
   );
 }

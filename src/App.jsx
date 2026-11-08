@@ -27,12 +27,13 @@ const cutoutCache = new Map();
  * Flood-fills the exterior #000000 background from the 4 corners of a 3D studio render
  * so the 3D object has a 100% transparent alpha background while preserving internal shadows.
  */
-function CutoutSculptureImg({ src, alt, className, loading }) {
-  const [cutoutSrc, setCutoutSrc] = useState(() => cutoutCache.get(src) || src);
+function CutoutSculptureImg({ src, grade = 'obsidian', alt, className, loading }) {
+  const cacheKey = `${src}::${grade}`;
+  const [cutoutSrc, setCutoutSrc] = useState(() => cutoutCache.get(cacheKey) || src);
 
   useEffect(() => {
-    if (cutoutCache.has(src)) {
-      setCutoutSrc(cutoutCache.get(src));
+    if (cutoutCache.has(cacheKey)) {
+      setCutoutSrc(cutoutCache.get(cacheKey));
       return;
     }
     let cancelled = false;
@@ -118,18 +119,45 @@ function CutoutSculptureImg({ src, alt, className, loading }) {
           }
         }
 
-        // Soften 1px fringe around exterior boundary
+        // Apply luxury studio metallic grade & soften 1px exterior fringe
         for (let y = 1; y < h - 1; y++) {
           for (let x = 1; x < w - 1; x++) {
             const i = y * w + x;
             if (!visited[i]) {
+              const idx4 = i * 4;
+              const r = data[idx4];
+              const g = data[idx4 + 1];
+              const b = data[idx4 + 2];
+              const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+
+              if (grade === 'champagne-gold') {
+                const c = Math.pow(lum, 0.88);
+                data[idx4] = Math.min(255, Math.round(c * 255 + 18));
+                data[idx4 + 1] = Math.min(255, Math.round(c * 212 + 8));
+                data[idx4 + 2] = Math.min(255, Math.round(c * 138));
+              } else if (grade === 'liquid-mercury') {
+                const c = Math.pow(lum, 0.92);
+                data[idx4] = Math.min(255, Math.round(c * 242));
+                data[idx4 + 1] = Math.min(255, Math.round(c * 248));
+                data[idx4 + 2] = Math.min(255, Math.round(c * 255));
+              } else if (grade === 'rose-bronze') {
+                const c = Math.pow(lum, 0.9);
+                data[idx4] = Math.min(255, Math.round(c * 238 + 12));
+                data[idx4 + 1] = Math.min(255, Math.round(c * 176 + 6));
+                data[idx4 + 2] = Math.min(255, Math.round(c * 148));
+              } else if (grade === 'smoked-crystal') {
+                const c = Math.pow(lum, 1.05);
+                data[idx4] = Math.min(255, Math.round(c * 215));
+                data[idx4 + 1] = Math.min(255, Math.round(c * 228));
+                data[idx4 + 2] = Math.min(255, Math.round(c * 248));
+              }
+
               const touchesBg =
                 visited[i - 1] || visited[i + 1] || visited[i - w] || visited[i + w];
               if (touchesBg) {
-                const idx4 = i * 4;
-                const lum = Math.max(data[idx4], data[idx4 + 1], data[idx4 + 2]);
-                if (lum < 68) {
-                  data[idx4 + 3] = Math.round((lum / 68) * 220);
+                const maxCh = Math.max(data[idx4], data[idx4 + 1], data[idx4 + 2]);
+                if (maxCh < 68) {
+                  data[idx4 + 3] = Math.round((maxCh / 68) * 220);
                 }
               }
             }
@@ -138,7 +166,7 @@ function CutoutSculptureImg({ src, alt, className, loading }) {
 
         ctx.putImageData(imgData, 0, 0);
         const url = canvas.toDataURL('image/png');
-        cutoutCache.set(src, url);
+        cutoutCache.set(cacheKey, url);
         if (!cancelled) setCutoutSrc(url);
       } catch {
         // Fallback to raw src if canvas fails
@@ -148,7 +176,7 @@ function CutoutSculptureImg({ src, alt, className, loading }) {
     return () => {
       cancelled = true;
     };
-  }, [src]);
+  }, [src, grade, cacheKey]);
 
   return <img src={cutoutSrc} alt={alt} className={className} loading={loading} />;
 }
@@ -343,7 +371,7 @@ function SomeHowManifestoFilm({ soundOn }) {
       {
         line1: 'WE FIND A WAY.',
         line2: 'SOME.HOW.',
-        imgSrc: HERO_3D_LOGOS[8].src,
+        imgSrc: HERO_3D_LOGOS[1].src,
       },
     ];
 
@@ -443,29 +471,11 @@ function SomeHowManifestoFilm({ soundOn }) {
 }
 
 export default function App() {
-  const [heroLogoIdx, setHeroLogoIdx] = useState(0);
-  const [autoMorph, setAutoMorph] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
   const [soundOn, setSoundOn] = useState(false);
   const [selectedWork, setSelectedWork] = useState(null);
   const [activePerspective, setActivePerspective] = useState(null);
   const [contactOpen, setContactOpen] = useState(false);
-
-  // Continuous 3D Logo Transformation Loop across all 12 SOME.HOW studio renders
-  useEffect(() => {
-    if (!autoMorph) return;
-    const timer = setInterval(() => {
-      setHeroLogoIdx((prev) => (prev + 1) % HERO_3D_LOGOS.length);
-    }, 145);
-    return () => clearInterval(timer);
-  }, [autoMorph]);
-
-  const handleSelectHeroLogo = (idx, pauseAuto = false) => {
-    setHeroLogoIdx(idx);
-    if (pauseAuto) {
-      setAutoMorph(false);
-    }
-  };
 
   const loaderRef = useRef(null);
   const loaderImgWRef = useRef(null);
@@ -1158,6 +1168,7 @@ export default function App() {
                 <CutoutSculptureImg
                   key={obj.id}
                   src={obj.src}
+                  grade={obj.grade}
                   alt={obj.alt}
                   className={`loader-img ${obj.cls}`}
                 />
@@ -1241,13 +1252,8 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Exact Navier-Stokes Fluid Cursor Mask revealing rapid-fire 3D SOME.HOW renders */}
-              <FluidHeroCanvas
-                activeIndex={heroLogoIdx}
-                onSelectIndex={handleSelectHeroLogo}
-                autoLoop={autoMorph}
-                onToggleAuto={() => setAutoMorph((v) => !v)}
-              />
+              {/* Exact Navier-Stokes Fluid Cursor Mask revealing 1:1 3D Luxury SOME.HOW Editions */}
+              <FluidHeroCanvas />
             </section>
 
             {/* 2. SHOWREEL SECTION (100% original SOME.HOW 60fps Showreel Canvas) */}
@@ -1542,30 +1548,35 @@ export default function App() {
                 <div ref={formesRef} className="formes-w">
                   <CutoutSculptureImg
                     src={LOADER_3D_OBJECTS[1].src}
+                    grade={LOADER_3D_OBJECTS[1].grade}
                     loading="lazy"
                     alt={LOADER_3D_OBJECTS[1].alt}
                     className="papier-form"
                   />
                   <CutoutSculptureImg
                     src={LOADER_3D_OBJECTS[5].src}
+                    grade={LOADER_3D_OBJECTS[5].grade}
                     loading="lazy"
                     alt={LOADER_3D_OBJECTS[5].alt}
                     className="chewing-gum"
                   />
                   <CutoutSculptureImg
                     src={LOADER_3D_OBJECTS[4].src}
+                    grade={LOADER_3D_OBJECTS[4].grade}
                     loading="lazy"
                     alt={LOADER_3D_OBJECTS[4].alt}
                     className="bonbon-copy"
                   />
                   <CutoutSculptureImg
                     src={LOADER_3D_OBJECTS[2].src}
+                    grade={LOADER_3D_OBJECTS[2].grade}
                     loading="lazy"
                     alt={LOADER_3D_OBJECTS[2].alt}
                     className="etoile"
                   />
                   <CutoutSculptureImg
                     src={LOADER_3D_OBJECTS[0].src}
+                    grade={LOADER_3D_OBJECTS[0].grade}
                     loading="lazy"
                     alt={LOADER_3D_OBJECTS[0].alt}
                     className="coeur-copy"
