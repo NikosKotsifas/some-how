@@ -1,37 +1,72 @@
-// ============================================================================
-// SOME.HOW — 100% Original 3D Sculptural, Editorial & Portfolio Assets
-// ============================================================================
-
+// Curated Luxury 3D Typographic Renders of SOME.HOW:
+// Pink Glossy Couture Fur, Silver Aluminum Foil, Glossy Yellow Bubbles, Disco Mirrorball,
+// Inflating Chrome Silver Balloon, 24K Gold Balloon, Molten Chrome, Obsidian Mylar, Bubble-Wrap.
 export const HERO_3D_LOGOS = [
   {
+    id: 'pink-fur',
+    src: 'somehow-assets/hero-pink-fur.jpg',
+    label: 'Glossy Pink Couture Fur',
+    inflatePulse: 0.012,
+  },
+  {
+    id: 'silver-foil',
+    src: 'somehow-assets/hero-silver-foil.jpg',
+    label: 'Crinkled Silver Aluminum Foil',
+    inflatePulse: 0.008,
+  },
+  {
+    id: 'yellow-bubbles',
+    src: 'somehow-assets/hero-yellow-bubbles.jpg',
+    label: 'Glossy Golden-Yellow Bubbles',
+    inflatePulse: 0.018,
+  },
+  {
+    id: 'disco-mirror',
+    src: 'somehow-assets/hero-disco-mirror.jpg',
+    label: 'Luxury Disco Mirrorball Tiles',
+    inflatePulse: 0.006,
+  },
+  {
+    id: 'silver-balloon',
+    src: 'somehow-assets/hero-silver-balloon.jpg',
+    label: 'Inflating Chrome Silver Balloon',
+    inflatePulse: 0.032,
+  },
+  {
+    id: 'gold-lux',
+    src: 'somehow-assets/hero-gold-lux.jpg',
+    label: '24K Champagne Gold Balloon',
+    inflatePulse: 0.024,
+  },
+  {
     id: 'liquid-mercury',
-    label: '01 // Liquid Mercury Platinum',
     src: 'somehow-assets/hero-09.jpg',
+    label: 'Liquid Platinum Chrome',
+    inflatePulse: 0.015,
   },
   {
     id: 'obsidian-mylar',
-    label: '02 // Obsidian Mylar Sculpture',
     src: 'somehow-assets/hero-01.jpg',
+    label: 'Obsidian Black Mylar Balloon',
+    inflatePulse: 0.022,
   },
   {
-    id: 'anodized-chrome',
-    label: '03 // Anodized Cobalt & Chrome',
-    src: 'somehow-assets/hero-03.jpg',
-  },
-  {
-    id: 'smoked-crystal',
-    label: '04 // Smoked Crystal & Prism',
+    id: 'crystal-bubbles',
     src: 'somehow-assets/hero-02.jpg',
+    label: 'Translucent Bubble Cushion',
+    inflatePulse: 0.016,
   },
   {
-    id: 'titanium-gold',
-    label: '05 // 24K Champagne Gold & Titanium',
-    src: 'somehow-assets/hero-09.jpg',
+    id: 'cobalt-foil',
+    src: 'somehow-assets/hero-03.jpg',
+    label: 'Anodized Cobalt & Chrome Foil',
+    inflatePulse: 0.01,
   },
   {
-    id: 'forged-carbon',
-    label: '06 // Forged Carbon & Laser Chrono',
-    src: 'somehow-assets/hero-01.jpg',
+    id: 'magenta-mylar',
+    src: 'somehow-assets/hero-11.jpg',
+    label: 'Glossy Magenta Mylar Vacuum',
+    inflatePulse: 0.018,
   },
 ];
 
