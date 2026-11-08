@@ -516,40 +516,48 @@ h2 {
 
 .hero-3d-style-switcher {
   position: absolute;
-  left: 1.25rem;
-  right: 1.25rem;
+  left: 2.5%;
+  right: 2.5%;
   bottom: 3.4rem;
   z-index: 8;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  justify-content: flex-start;
+  gap: 0.38rem;
   pointer-events: auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.hero-3d-style-switcher::-webkit-scrollbar {
+  display: none;
 }
 
 .hero-style-chips-list {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  flex-wrap: wrap;
+  gap: 0.38rem;
+  flex-wrap: nowrap;
 }
 
 .hero-style-chip {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.61rem;
+  white-space: nowrap;
+  flex-shrink: 0;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.52);
-  background: rgba(10, 10, 14, 0.78);
+  letter-spacing: 0.09em;
+  color: rgba(255, 255, 255, 0.54);
+  background: rgba(10, 10, 14, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 0;
-  padding: 0.36rem 0.62rem;
+  padding: 0.34rem 0.52rem;
   backdrop-filter: blur(12px);
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, color 0.25s ease, background-color 0.25s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.42rem;
+  gap: 0.38rem;
 }
 
 .hero-style-chip:hover,

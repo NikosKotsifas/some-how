@@ -391,16 +391,23 @@ const COMPOSITE_FRAG = `
     float fluidHalo = clamp(smoothstep(0.04, uEdgeSoftness + 0.22, raw), 0.0, 1.0);
     float edgeRim = fluidMask * (1.0 - fluidMask) * 4.0;
 
-    // Compute true 3D surface normal from the exact 1:1 LETTER_DEFS bevel heightfield
-    vec2 stepUv = uLogoTexel * 2.2;
-    float hL = texture2D(uLogoDataTex, flippedUv - vec2(stepUv.x, 0.0)).g;
-    float hR = texture2D(uLogoDataTex, flippedUv + vec2(stepUv.x, 0.0)).g;
-    float hD = texture2D(uLogoDataTex, flippedUv - vec2(0.0, stepUv.y)).g;
-    float hU = texture2D(uLogoDataTex, flippedUv + vec2(0.0, stepUv.y)).g;
+    // Compute silky-smooth multi-scale 3D surface normal from the Gaussian-blurred LETTER_DEFS pillow heightfield
+    vec2 s1 = uLogoTexel * 3.5;
+    vec2 s2 = uLogoTexel * 8.0;
+    float hL1 = texture2D(uLogoDataTex, flippedUv - vec2(s1.x, 0.0)).g;
+    float hR1 = texture2D(uLogoDataTex, flippedUv + vec2(s1.x, 0.0)).g;
+    float hD1 = texture2D(uLogoDataTex, flippedUv - vec2(0.0, s1.y)).g;
+    float hU1 = texture2D(uLogoDataTex, flippedUv + vec2(0.0, s1.y)).g;
 
+    float hL2 = texture2D(uLogoDataTex, flippedUv - vec2(s2.x, 0.0)).g;
+    float hR2 = texture2D(uLogoDataTex, flippedUv + vec2(s2.x, 0.0)).g;
+    float hD2 = texture2D(uLogoDataTex, flippedUv - vec2(0.0, s2.y)).g;
+    float hU2 = texture2D(uLogoDataTex, flippedUv + vec2(0.0, s2.y)).g;
+
+    vec2 gradSmooth = vec2((hR1 - hL1) * 0.45 + (hR2 - hL2) * 0.55, (hU1 - hD1) * 0.45 + (hU2 - hD2) * 0.55);
     vec2 fluidVel = texture2D(uVelocity, vUv).xy;
-    float microWave = sin(flippedUv.x * 36.0 - uTime * 2.1 + flippedUv.y * 14.0) * 0.025;
-    vec2 dH = vec2(hR - hL, hU - hD) * 7.8 + fluidVel * 0.32 + vec2(microWave, -microWave);
+    float liquidWave = sin(flippedUv.x * 18.0 - uTime * 1.8 + flippedUv.y * 9.0) * 0.04;
+    vec2 dH = gradSmooth * 5.2 + fluidVel * 0.28 + vec2(liquidWave, -liquidWave * 0.7);
     vec3 N = normalize(vec3(-dH.x, -dH.y, 1.0));
 
     vec2 envUv = clamp(flippedUv * 0.7 + 0.15 + N.xy * 0.2 + fluidVel * 0.04, 0.02, 0.98);
@@ -700,49 +707,69 @@ export default function FluidHeroCanvas() {
       maskCtx.fill(combinedPath);
       maskCtx.restore();
 
-      // Offscreen pass B: Smooth 3D Sculptural Dome Heightfield (Green channel)
+      // Offscreen pass B: Silky-Smooth Gaussian-Filtered 3D Sculptural Pillow Heightfield (Green channel)
+      const rawHeightCanvas = document.createElement('canvas');
+      rawHeightCanvas.width = w;
+      rawHeightCanvas.height = h;
+      const rawHeightCtx = rawHeightCanvas.getContext('2d');
+      rawHeightCtx.fillStyle = '#000000';
+      rawHeightCtx.fillRect(0, 0, w, h);
+      rawHeightCtx.save();
+      rawHeightCtx.translate(padX, offsetY);
+      rawHeightCtx.scale(scale, scale);
+      rawHeightCtx.clip(combinedPath);
+      rawHeightCtx.fillStyle = '#ffffff';
+      rawHeightCtx.fill(combinedPath);
+      rawHeightCtx.lineJoin = 'round';
+      rawHeightCtx.lineCap = 'round';
+      const steps = 28;
+      for (let s = steps; s >= 1; s--) {
+        const lw = (s / steps) * 76;
+        rawHeightCtx.strokeStyle = 'rgba(0, 0, 0, 0.085)';
+        rawHeightCtx.lineWidth = lw;
+        rawHeightCtx.stroke(combinedPath);
+      }
+      rawHeightCtx.restore();
+
       const heightCanvas = document.createElement('canvas');
       heightCanvas.width = w;
       heightCanvas.height = h;
       const heightCtx = heightCanvas.getContext('2d', { willReadFrequently: true });
-      heightCtx.save();
-      heightCtx.translate(padX, offsetY);
-      heightCtx.scale(scale, scale);
-      heightCtx.clip(combinedPath);
-      heightCtx.fillStyle = '#ffffff';
-      heightCtx.fill(combinedPath);
-      heightCtx.lineJoin = 'round';
-      heightCtx.lineCap = 'round';
-      const steps = 20;
-      for (let s = steps; s >= 1; s--) {
-        const lw = (s / steps) * 62;
-        heightCtx.strokeStyle = 'rgba(0, 0, 0, 0.105)';
-        heightCtx.lineWidth = lw;
-        heightCtx.stroke(combinedPath);
-      }
-      heightCtx.restore();
+      const blurPx = Math.max(6, Math.round(16 * scale));
+      heightCtx.filter = `blur(${blurPx}px)`;
+      heightCtx.drawImage(rawHeightCanvas, 0, 0);
+      heightCtx.filter = 'none';
 
-      // Offscreen pass C: Machined Inner Architectural Chamfer Ring (Blue channel)
+      // Offscreen pass C: Smooth Optical Rim Specular Ring (Blue channel)
+      const rawChamferCanvas = document.createElement('canvas');
+      rawChamferCanvas.width = w;
+      rawChamferCanvas.height = h;
+      const rawChamferCtx = rawChamferCanvas.getContext('2d');
+      rawChamferCtx.save();
+      rawChamferCtx.translate(padX, offsetY);
+      rawChamferCtx.scale(scale, scale);
+      rawChamferCtx.clip(combinedPath);
+      rawChamferCtx.lineJoin = 'round';
+      rawChamferCtx.lineCap = 'round';
+      rawChamferCtx.strokeStyle = '#ffffff';
+      rawChamferCtx.lineWidth = 22;
+      rawChamferCtx.stroke(combinedPath);
+      rawChamferCtx.strokeStyle = '#000000';
+      rawChamferCtx.lineWidth = 12;
+      rawChamferCtx.stroke(combinedPath);
+      rawChamferCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      rawChamferCtx.lineWidth = 4;
+      rawChamferCtx.stroke(combinedPath);
+      rawChamferCtx.restore();
+
       const chamferCanvas = document.createElement('canvas');
       chamferCanvas.width = w;
       chamferCanvas.height = h;
       const chamferCtx = chamferCanvas.getContext('2d', { willReadFrequently: true });
-      chamferCtx.save();
-      chamferCtx.translate(padX, offsetY);
-      chamferCtx.scale(scale, scale);
-      chamferCtx.clip(combinedPath);
-      chamferCtx.lineJoin = 'round';
-      chamferCtx.lineCap = 'round';
-      chamferCtx.strokeStyle = '#ffffff';
-      chamferCtx.lineWidth = 19;
-      chamferCtx.stroke(combinedPath);
-      chamferCtx.strokeStyle = '#000000';
-      chamferCtx.lineWidth = 11;
-      chamferCtx.stroke(combinedPath);
-      chamferCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-      chamferCtx.lineWidth = 3.5;
-      chamferCtx.stroke(combinedPath);
-      chamferCtx.restore();
+      const chamferBlurPx = Math.max(2, Math.round(4.5 * scale));
+      chamferCtx.filter = `blur(${chamferBlurPx}px)`;
+      chamferCtx.drawImage(rawChamferCanvas, 0, 0);
+      chamferCtx.filter = 'none';
 
       const maskData = maskCtx.getImageData(0, 0, w, h).data;
       const heightData = heightCtx.getImageData(0, 0, w, h).data;
